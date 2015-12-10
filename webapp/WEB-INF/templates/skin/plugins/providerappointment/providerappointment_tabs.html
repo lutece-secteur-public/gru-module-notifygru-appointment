@@ -1,0 +1,11 @@
+<#macro tabs tab >
+<div>
+    <ul class="nav nav-tabs">
+        <li <#if tab="test">class="active"</#if>>
+            <a href="jsp/site/Portal.jsp?page=test">
+                #i18n{providerappointment.manage_tests.pageTitle}
+            </a>
+        </li>
+    </ul>
+</div>
+</#macro>

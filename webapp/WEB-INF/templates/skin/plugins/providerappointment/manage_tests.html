@@ -1,0 +1,48 @@
+<#include "providerappointment_tabs.html" />
+<@tabs tab="test" />
+
+<div class="row" >
+    <div class="col-sm-12">
+
+        <@messages infos=infos />
+
+        <form method="post"  action="jsp/site/Portal.jsp?page=test">
+            <button name="view_createTest" class="btn btn-primary pull-right" type="submit">
+                <span class="glyphicon glyphicon-plus"></span>
+                #i18n{providerappointment.manage_tests.buttonAdd}
+            </button>
+        </form>
+
+    <h4>#i18n{providerappointment.manage_tests.tableLabel}</h4>
+        
+    <table class="table table-condensed table-striped">
+        <tr>
+            <input type="hidden" id="id" name="id"/>
+            <th>#i18n{providerappointment.manage_tests.columnName}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+            <#list test_list as test >
+        <tr>
+            <input type="hidden" id="id" name="id" />
+            <td>
+                ${test.name}
+            </td>    
+        <td>
+            <a href="jsp/site/Portal.jsp?page=test&view=modifyTest&id=${test.id}"
+               class="btn btn-primary btn-small" title="#i18n{portal.util.labelModify}">
+                <span class="glyphicon glyphicon-edit"></span>
+            </a>
+
+            <a href="jsp/site/Portal.jsp?page=test&action=confirmRemoveTest&id=${test.id}"
+               class="btn btn-danger btn-small" title="#i18n{portal.util.labelDelete}" >
+                <span class="glyphicon glyphicon-trash"></span>
+            </a>
+        </td>
+        </tr>
+        </#list>
+    </table>
+    
+    </div>
+</div>
+
+  

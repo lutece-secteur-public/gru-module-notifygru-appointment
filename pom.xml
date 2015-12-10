@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>lutece-global-pom</artifactId>
+        <groupId>fr.paris.lutece.tools</groupId>
+        <version>3.0.3</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.paris.lutece.plugins</groupId>
+    <artifactId>module-provider-appointment</artifactId>
+    <packaging>lutece-plugin</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Lutece provider appointment module</name>
+
+    <repositories>
+        <repository>
+            <id>lutece</id>
+            <name>luteceRepository</name>
+            <url>http://dev.lutece.paris.fr/maven_repository</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>fr.paris.lutece</groupId>
+            <artifactId>lutece-core</artifactId>
+            <version>[5.0.0,)</version>
+            <type>lutece-core</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>fr.paris.lutece.plugins</groupId>
+            <artifactId>plugin-appointment</artifactId>
+            <version>[1.0.0,)</version>
+            <type>lutece-plugin</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>fr.paris.lutece.plugins</groupId>
+            <artifactId>module-workflow-notifygru</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <type>lutece-plugin</type>
+        </dependency>
+        
+    </dependencies>
+
+    <properties>
+        <componentName>Module Provider Appointment</componentName>
+        <jiraProjectName>MPROAPT</jiraProjectName>
+        <jiraComponentId>12921</jiraComponentId>
+    </properties>
+    
+    <scm>
+        <connection>scm:git:https://github.com/lutece-secteur-public/gru-module-provider-appointment.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-module-provider-appointment.git</developerConnection>
+        <url>https://github.com/lutece-secteur-public/gru-module-provider-appointment.git</url>
+      <tag>HEAD</tag>
+  	</scm>
+</project>
