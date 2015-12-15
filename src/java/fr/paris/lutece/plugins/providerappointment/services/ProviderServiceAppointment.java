@@ -77,23 +77,7 @@ public class ProviderServiceAppointment extends AbstractServiceProvider
 	}
 
 	@Override
-	public String getStatus(int nIdResource) 
-	{
-		int nStatus = 0;
-		String strStatus = null;
-		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResource );
-		Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-		nStatus = appointment.getStatus();
-		if(nStatus == 10)
-			strStatus = MESSAGE_LABEL_STATUS_RESERVED;
-		if(nStatus == -10)
-			strStatus = MESSAGE_LABEL_STATUS_UNRESERVED;
-		
-		return strStatus;
-	}
-
-	@Override
-	public String getMobilePhoneNumber(int nIdResource) 
+	public String getOptionalMobilePhoneNumber(int nIdResource) 
 	{
 		String strPhoneNumber = null;
 		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResource );
@@ -143,32 +127,6 @@ public class ProviderServiceAppointment extends AbstractServiceProvider
 	}
 
 	@Override
-	public Boolean isMobilePhoneNumberAvailable(int nIdResource) {
-		return this.getMobilePhoneNumber(nIdResource) == null;
-	}
-
-	@Override
-	public int getIdDemand(int nIdResource) {
-		return 0;
-	}
-
-	@Override
-	public Boolean isIdDemandAvailable(int nIdResource) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getIdDemandType(int nIdResource) {
-		return 0;
-	}
-
-	@Override
-	public Boolean isIdDemandTypeAvailable(int nIdResource) {
-		return null;
-	}
-
-	@Override
 	public String getInfosHelp(Locale local) {
 		Map<String, Object> model = new HashMap<>();
         
@@ -180,7 +138,7 @@ public class ProviderServiceAppointment extends AbstractServiceProvider
 	}
 
 	@Override
-	public Object getInfos(int nIdResource) 
+	public Map<String, Object> getInfos(int nIdResource) 
 	{
 		Map<String, Object> model = new HashMap<String, Object>(  );
 		
@@ -224,7 +182,17 @@ public class ProviderServiceAppointment extends AbstractServiceProvider
 	public void setIdAppointment(int nIdAppointment) {
 		this._nIdAppointment = nIdAppointment;
 	}
-	
-	
+
+	@Override
+	public int getOptionalDemandId(int nIdResource) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getOptionalDemandIdType(int nIdResource) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 }
