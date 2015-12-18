@@ -1,10 +1,38 @@
-<div>
-	<label>#i18n{providerappointment.task_notify_gru_config.label_entry_appointment_comment}</label>
-	<div>
-		<ul>
-			<li>${r"${firstName}"} : #i18n{providerappointment.task_notify_appointment_config.label_firstname}</li>
-			<li>${r"${lastName}"} : #i18n{providerappointment.task_notify_appointment_config.label_lastname}</li>
-			<li>${r"${email}"} : #i18n{providerappointment.task_notify_appointment_config.label_email}</li>
-		</ul>
-	</div>
+
+<div class="row">   
+      <fieldset>
+                <legend style="font-size:1em">#i18n{providerappointment.task_notify_gru_config.label_entry_appointment_comment}</legend>
+                <table class="table table-striped table-condensed">
+                	<tr>
+                        <th> #i18n{providerappointment.task_notify_appointment_config.label_Entry}</th>
+                        <th>#i18n{providerappointment.task_notify_appointment_config.label_freemarker}</th>
+                    </tr>
+                    <tr>
+                    	<td>#i18n{providerappointment.task_notify_appointment_config.label_firstname}</th>
+                        <td> &#36;&#123;firstName&#125;</th>
+                    </tr>
+                    <tr>
+                    	<td>#i18n{providerappointment.task_notify_appointment_config.label_lastname}</th>
+                        <td> &#36;&#123;lastName&#125;</th>
+                    </tr>
+                    <tr>
+                    	<td>#i18n{providerappointment.task_notify_appointment_config.label_email}</th>
+                        <td> &#36;&#123;email&#125;</th>
+                    </tr>
+                    <#list listResponse as response>
+                    <tr>
+                    <#if response?has_content>
+                        <td>
+                            ${response.entry.title}
+                        </td>
+                        <td>
+                            &#36;&#123;${response.entry.title}&#125;
+                        </td>
+                    </#if>
+                    </tr>
+                    </#list>
+                </table>
+            </fieldset>  
+    
+	
 </div>

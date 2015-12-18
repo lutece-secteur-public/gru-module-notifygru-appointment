@@ -21,16 +21,7 @@
 
     <!-- Admin features parameters -->
     <admin-features>
-    </admin-features>    
-
-    <!-- XPages parameters -->
-    <applications>
-        <application>
-            <application-id>test</application-id>
-            <application-class>fr.paris.lutece.plugins.providerappointment.web.TestXPage</application-class>
-        </application>
-    </applications>
-
+    </admin-features>   
     <!-- Portlet parameters -->
     <portlets>
    </portlets>

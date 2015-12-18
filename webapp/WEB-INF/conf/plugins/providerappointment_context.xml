@@ -12,10 +12,9 @@
        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd" >
        
     <bean id="provider-appointment.providerAppointment"  
-    	class="fr.paris.lutece.plugins.providerappointment.services.ProviderServiceAppointment" 
+    	class="fr.paris.lutece.plugins.providerappointment.services.ProviderAppointment" 
     	p:key="provider-appointment.providerAppointment"
  		p:titleI18nKey="providerappointment.task_notify_gru_provider_appointment"
-        p:beanName="provider-appointment.providerAppointment" />  
-
-    <bean id="provider-appointment.testDAO"  class="fr.paris.lutece.plugins.providerappointment.business.TestDAO" />  
+        p:beanName="provider-appointment.providerAppointment" 
+        p:IdAppointment="1"/>  
 </beans>
