@@ -25,7 +25,7 @@ import fr.paris.lutece.plugins.genericattributes.business.ResponseHome;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.EntryTypeServiceManager;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider;
-import fr.paris.lutece.plugins.workflow.modules.notifygru.utils.constants.TaskNotifyGruConstants;
+import fr.paris.lutece.plugins.workflow.modules.notifygru.utils.constants.Constants;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
@@ -203,7 +203,7 @@ public class ProviderAppointment extends AbstractServiceProvider {
 
 	@Override
 	public int getOptionalDemandIdType(int nIdResource) {
-		return TaskNotifyGruConstants.OPTIONAL_INT_VALUE;
+		return Constants.OPTIONAL_INT_VALUE;
 	}
 	/**
 	 * 
