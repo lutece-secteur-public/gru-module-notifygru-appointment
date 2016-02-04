@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plug-in>
-    <name>provider-appointment</name>
-    <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
+    <name>notifygru-appointment</name>
+    <class>fr.paris.lutece.plugins.notifygru.modules.appointment.NotifyGruAppointmentPlugin</class>
     <version>1.0.0</version>
     <documentation></documentation>
     <installation></installation>
     <changes></changes>
     <user-guide></user-guide>
-    <description>providerappointment.plugin.description</description>
-    <provider>providerappointment.plugin.provider</provider>
+    <description>module.notifygru.appointment.module.description</description>
+    <provider>module.notifygru.appointment.module.provider</provider>
     <provider-url>http://lutece.paris.fr</provider-url>
-    <icon-url>images/admin/skin/feature_default_icon.png</icon-url>
+    <icon-url>images/admin/skin/plugins/notifygru/appointment/provider.png</icon-url>
     <copyright>Copyright (c) 2015 Your Company</copyright>
     <db-pool-required>1</db-pool-required>
     

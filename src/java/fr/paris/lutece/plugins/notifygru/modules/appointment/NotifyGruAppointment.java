@@ -1,4 +1,4 @@
-package fr.paris.lutece.plugins.providerappointment.services;
+package fr.paris.lutece.plugins.notifygru.modules.appointment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistorySer
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
-public class ProviderAppointment extends AbstractServiceProvider {
+public class NotifyGruAppointment extends AbstractServiceProvider {
 
 	// MARKS
     private static final String MARK_MESSAGE = "message";
@@ -44,7 +44,7 @@ public class ProviderAppointment extends AbstractServiceProvider {
     private static final String MARK_TIME_APPOINTMENT = "time_appointment";
     private static final String MARK_RECAP = "recap";
     
-	private static final String TEMPLATE_INFOS_HELP = "admin/plugins/providerappointment/infos_help.html";
+	private static final String TEMPLATE_INFOS_HELP = "admin/plugins/workflow/modules/notifygru/appointment/freemarker_list.html";
 	
 	private static final String MESSAGE_LABEL_STATUS_RESERVED = "appointment.message.labelStatusReserved";
     private static final String MESSAGE_LABEL_STATUS_UNRESERVED = "appointment.message.labelStatusUnreserved";
