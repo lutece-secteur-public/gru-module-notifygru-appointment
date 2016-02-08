@@ -21,14 +21,14 @@
                     	<td>#i18n{module.notifygru.appointment.task_notify_appointment_config.label_email}</th>
                         <td> &#36;&#123;email&#125;</th>
                     </tr>
-                    <#list listResponse as response>
+                    <#list listEntry as entry>
                     <tr>
-                    <#if response?has_content>
+                    <#if entry?has_content>
                         <td>
-                            ${response.entry.title}
+                            ${entry.title}
                         </td>
-                        <td>
-                            &#36;&#123;${response.entry.title}&#125;
+                        <td>                         
+                               &#36;&#123;reponse_${entry.position}&#125;
                         </td>
                     </#if>
                     </tr>

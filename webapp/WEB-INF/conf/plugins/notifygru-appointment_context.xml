@@ -16,5 +16,6 @@
     	p:key="notifygru-appointment.ProviderService"
  		p:titleI18nKey="module.notifygru.appointment.module.providerappointment"
         p:beanName="notifygru-appointment.ProviderService" 
-        p:IdAppointment="1"/>  
+        p:OrderPhoneNumber="1"
+        p:IdFormAppointment="1"/>  
 </beans>

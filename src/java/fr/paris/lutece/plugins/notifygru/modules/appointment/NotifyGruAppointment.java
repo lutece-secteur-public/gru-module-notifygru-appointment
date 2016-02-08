@@ -1,29 +1,46 @@
+/*
+ * Copyright (c) 2002-2015, Mairie de Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.notifygru.modules.appointment;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.apache.commons.lang.StringUtils;
 
 import fr.paris.lutece.plugins.appointment.business.Appointment;
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
+import fr.paris.lutece.plugins.appointment.business.AppointmentFormHome;
 import fr.paris.lutece.plugins.appointment.business.AppointmentHome;
-import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlot;
-import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlotHome;
-import fr.paris.lutece.plugins.appointment.service.AppointmentService;
-import fr.paris.lutece.plugins.appointment.service.entrytype.EntryTypePhone;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
-import fr.paris.lutece.plugins.genericattributes.business.ResponseHome;
-import fr.paris.lutece.plugins.genericattributes.service.entrytype.EntryTypeServiceManager;
-import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.utils.constants.Constants;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
@@ -31,204 +48,252 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistorySer
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
-public class NotifyGruAppointment extends AbstractServiceProvider {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-	// MARKS
-    private static final String MARK_MESSAGE = "message";
-    private static final String MARK_LIST_RESPONSE = "listResponse";
-    private static final String MARK_FIRSTNAME = "firstName";
-    private static final String MARK_LASTNAME = "lastName";
-    private static final String MARK_EMAIL = "email";
-    private static final String MARK_REFERENCE = "reference";
-    private static final String MARK_DATE_APPOINTMENT = "date_appointment";
-    private static final String MARK_TIME_APPOINTMENT = "time_appointment";
-    private static final String MARK_RECAP = "recap";
+import javax.inject.Inject;
+
+
+
+/**
+ * The Class NotifyGruAppointment.
+ */
+public class NotifyGruAppointment extends AbstractServiceProvider
+{
     
-	private static final String TEMPLATE_INFOS_HELP = "admin/plugins/workflow/modules/notifygru/appointment/freemarker_list.html";
-	
-	private static final String MESSAGE_LABEL_STATUS_RESERVED = "appointment.message.labelStatusReserved";
-    private static final String MESSAGE_LABEL_STATUS_UNRESERVED = "appointment.message.labelStatusUnreserved";
-	// SERVICES
+    /** The Constant MARK_LIST_RESPONSE. */
+    // MARKS   
+    private static final String MARK_LIST_RESPONSE = "listEntry";
+    
+    /** The Constant MARK_FIRSTNAME. */
+    private static final String MARK_FIRSTNAME = "firstName";
+    
+    /** The Constant MARK_LASTNAME. */
+    private static final String MARK_LASTNAME = "lastName";
+    
+    /** The Constant MARK_EMAIL. */
+    private static final String MARK_EMAIL = "email";
+    
+    /** The Constant MARK_ENTRY_BASE. */
+    private static final String MARK_ENTRY_BASE = "reponse_";
+    
+    /** The Constant TEMPLATE_INFOS_HELP. */
+    private static final String TEMPLATE_INFOS_HELP = "admin/plugins/workflow/modules/notifygru/appointment/freemarker_list.html";
+
+    /** The _resource history service. */
+    // SERVICES
     @Inject
     private IResourceHistoryService _resourceHistoryService;
     
-    private int _nIdAppointment;
+    /** The _nid form appointment. */
+    private int _nidFormAppointment;
+    
+    /** The _n order phone number. */
+    private int _nOrderPhoneNumber;
 
-	@Override
-	public String getUserEmail(int nIdResource) 
-	{
-		String strEmail = null;
-		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResource );
-		Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-		strEmail = appointment.getEmail(  );
-		
-		return strEmail;
-	}
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getUserEmail(int)
+     */
+    @Override
+    public String getUserEmail( int nIdResourceHistory )
+    {
+        String strEmail = null;
+        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
+        strEmail = appointment.getEmail(  );
 
-	@Override
-	public String getUserGuid(int nIdResource) 
-	{
-		String strIdUser = "";
-		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResource );
-		Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-		strIdUser = appointment.getIdUser();
-		
-		return strIdUser;
-	}
+        return strEmail;
+    }
 
-	@Override
-	public String getOptionalMobilePhoneNumber(int nIdResource) 
-	{
-		String strPhoneNumber = null;
-		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResource );
-		Appointment appointment = AppointmentHome.findByPrimaryKey(resourceHistory.getIdResource(  ));
-        AppointmentSlot slot = AppointmentSlotHome.findByPrimaryKey( appointment.getIdSlot(  ) );
-        EntryFilter entryFilter = new EntryFilter(  );
-        entryFilter.setIdResource( slot.getIdForm(  ) );
-        entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
-        entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getUserGuid(int)
+     */
+    @Override
+    public String getUserGuid( int nIdResourceHistory )
+    {
+        String strIdUser = "";
+        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
+        strIdUser = appointment.getIdUser(  );
 
-        List<Integer> listIdResponse = AppointmentHome.findListIdResponse( appointment.getIdAppointment(  ) );
+        return strIdUser;
+    }
 
-        List<Response> listResponses = new ArrayList<Response>( listIdResponse.size(  ) );
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getOptionalMobilePhoneNumber(int)
+     */
+    @Override
+    public String getOptionalMobilePhoneNumber( int nIdResourceHistory )
+    {
+        String strPhoneNumber = null;
+        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
 
-        for ( int nIdResponse : listIdResponse )
+        List<Response> listResponses = AppointmentHome.findListResponse( appointment.getIdAppointment(  ) );
+
+        for ( Response response : listResponses )
         {
-            listResponses.add( ResponseHome.findByPrimaryKey( nIdResponse ) );
-        }
+            Entry entry = EntryHome.findByPrimaryKey( response.getEntry(  ).getIdEntry(  ) );
 
-        List<Entry> listEntries = EntryHome.getEntryList( entryFilter );
-
-        for ( Entry entry : listEntries )
-        {
-            IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( entry );
-
-            if ( entryTypeService instanceof EntryTypePhone )
+            if ( entry.getPosition(  ) == getOrderPhoneNumber(  ) )
             {
-                for ( Response response : listResponses )
-                {
-                    if ( ( response.getEntry(  ).getIdEntry(  ) == entry.getIdEntry(  ) ) &&
-                            StringUtils.isNotBlank( response.getResponseValue(  ) ) )
-                    {
-                        strPhoneNumber = response.getResponseValue(  );
-                        break;
-                    }
-                }
-
-                if ( StringUtils.isNotEmpty( strPhoneNumber ) )
-                {
-                    break;
-                }
+                strPhoneNumber = response.getResponseValue(  );
             }
         }
-        
-		return strPhoneNumber;
-	}
 
-	@Override
-	public String getInfosHelp(Locale local) {
-		Map<String, Object> model = new HashMap<>();
-		List<Response> listResponses = getListResponse(_nIdAppointment);
-        model.put(MARK_LIST_RESPONSE, listResponses);
+        return strPhoneNumber;
+    }
+
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getInfosHelp(java.util.Locale)
+     */
+    @Override
+    public String getInfosHelp( Locale local )
+    {
+        Map<String, Object> model = new HashMap<String, Object>(  );
+        AppointmentForm formAppointment = AppointmentFormHome.findByPrimaryKey( _nidFormAppointment );
+
+        EntryFilter entryFilter = new EntryFilter(  );
+        entryFilter.setIdResource( formAppointment.getIdForm(  ) );
+        entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
+        entryFilter.setEntryParentNull( EntryFilter.FILTER_TRUE );
+        entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
+
+        List<Entry> listEntry = EntryHome.getEntryList( entryFilter );
+
+        model.put( MARK_LIST_RESPONSE, listEntry );
+
         HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
-        		TEMPLATE_INFOS_HELP, local, model ).getHtml(  ), local, model );
-		//HtmlTemplate t = AppTemplateService.getTemplate( TEMPLATE_INFOS_HELP, local, model );
+                    TEMPLATE_INFOS_HELP, local, model ).getHtml(  ), local, model );
 
-        String strResourceInfo = t.getHtml();
+        String strResourceInfo = t.getHtml(  );
 
         return strResourceInfo;
-	}
+    }
 
-	@Override
-	public Map<String, Object> getInfos(int nIdResource) 
-	{
-		Map<String, Object> model = new HashMap<String, Object>(  );
-		
-		if(nIdResource>0)
-		{
-			Appointment appointment=getAppointment(nIdResource);
-	        AppointmentSlot slot = AppointmentSlotHome.findByPrimaryKey( appointment.getIdSlot(  ) );
-	        List<Response> listResponses = getListResponse(nIdResource);
-	        
-	        for(Response response: listResponses)
-	        {
-	        	model.put(response.getEntry().getTitle(), response.getResponseValue());
-	        }
-	        model.put( MARK_FIRSTNAME, appointment.getFirstName(  ) );
-	        model.put( MARK_LASTNAME, appointment.getLastName(  ) );
-	        model.put( MARK_EMAIL, appointment.getEmail(  ) );
-	        model.put( MARK_REFERENCE, AppointmentService.getService(  ).computeRefAppointment( appointment ) );
-	        model.put( MARK_DATE_APPOINTMENT, appointment.getDateAppointment(  ) );
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getInfos(int)
+     */
+    @Override
+    public Map<String, Object> getInfos( int nIdResourceHistory )
+    {
+        Map<String, Object> model = new HashMap<String, Object>(  );
 
-	        String strStartingTime = AppointmentService.getService(  )
-	                                                   .getFormatedStringTime( slot.getStartingHour(  ), slot.getStartingMinute(  ) );
-	        model.put( MARK_TIME_APPOINTMENT, strStartingTime );
-		}
-		else
-		{
-			List<Response> listResponses = getListResponse(_nIdAppointment);
-	        for(Response response: listResponses)
-	        {
-	        	model.put(response.getEntry().getTitle(),"");
-	        }
-			model.put( MARK_FIRSTNAME, "" );
-	        model.put( MARK_LASTNAME, "" );
-	        model.put( MARK_EMAIL, "" );
-		}
-		
-        
-        return model;
-	}
-
-	/**
-	 * @return the _nIdAppointment
-	 */
-	public int getIdAppointment() {
-		return _nIdAppointment;
-	}
-
-	/**
-	 * @param _nIdAppointment the _nIdAppointment to set
-	 */
-	public void setIdAppointment(int nIdAppointment) {
-		this._nIdAppointment = nIdAppointment;
-	}
-
-	@Override
-	public int getOptionalDemandId(int nIdResource) {
-		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResource );
-		Appointment appointment = AppointmentHome.findByPrimaryKey(resourceHistory.getIdResource(  ));
-		return appointment.getIdAppointment();
-	}
-
-	@Override
-	public int getOptionalDemandIdType(int nIdResource) {
-		return Constants.OPTIONAL_INT_VALUE;
-	}
-	/**
-	 * 
-	 * @param nIdResource
-	 * @return
-	 */
-	public Appointment getAppointment(int nIdResource)
-	{
-		ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResource );
-		Appointment appointment = AppointmentHome.findByPrimaryKey(resourceHistory.getIdResource(  ));
-		return appointment;
-	}
-	/**
-	 * 
-	 * @param nIdResponse
-	 * @return
-	 */
-	public List<Response> getListResponse(int nIdResponse){
-		List<Integer> listIdResponse = AppointmentHome.findListIdResponse( nIdResponse );
-
-        List<Response> listResponses = new ArrayList<Response>( listIdResponse.size(  ) );
-        for ( int IdResponse : listIdResponse )
+        if ( nIdResourceHistory > 0 )
         {
-            listResponses.add( ResponseHome.findByPrimaryKey( IdResponse ) );
+            ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+            Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
+
+            model.put( MARK_FIRSTNAME, appointment.getFirstName(  ) );
+            model.put( MARK_LASTNAME, appointment.getLastName(  ) );
+            model.put( MARK_EMAIL, appointment.getEmail(  ) );
+
+            List<Response> listResponses = AppointmentHome.findListResponse( appointment.getIdAppointment(  ) );
+
+            for ( Response response : listResponses )
+            {
+                Entry entry = EntryHome.findByPrimaryKey( response.getEntry(  ).getIdEntry(  ) );
+                model.put( MARK_ENTRY_BASE + entry.getPosition(  ), response.getResponseValue(  ) );
+            }
         }
-		return listResponses;
-	}
+        else
+        {
+            model.put( MARK_FIRSTNAME, "" );
+            model.put( MARK_LASTNAME, "" );
+            model.put( MARK_EMAIL, "" );
+
+            AppointmentForm formAppointment = AppointmentFormHome.findByPrimaryKey( _nidFormAppointment );
+            EntryFilter entryFilter = new EntryFilter(  );
+            entryFilter.setIdResource( formAppointment.getIdForm(  ) );
+            entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
+            entryFilter.setEntryParentNull( EntryFilter.FILTER_TRUE );
+            entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
+
+            List<Entry> listEntry = EntryHome.getEntryList( entryFilter );
+
+            for ( Entry entry : listEntry )
+            {
+                model.put( MARK_ENTRY_BASE + entry.getPosition(  ), "" );
+            }
+        }
+
+        return model;
+    }
+
+    /**
+     * Gets the id form appointment.
+     *
+     * @return the id form appointment
+     */
+    public int getIdFormAppointment(  )
+    {
+        return _nidFormAppointment;
+    }
+
+    /**
+     * Sets the id form appointment.
+     *
+     * @param nIdFormAppointment the new id form appointment
+     */
+    public void setIdFormAppointment( int nIdFormAppointment )
+    {
+        this._nidFormAppointment = nIdFormAppointment;
+    }
+
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getOptionalDemandId(int)
+     */
+    @Override
+    public int getOptionalDemandId( int nIdResourceHistory )
+    {
+        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
+
+        return appointment.getIdAppointment(  );
+    }
+
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getOptionalDemandIdType(int)
+     */
+    @Override
+    public int getOptionalDemandIdType( int nIdResourceHistory )
+    {
+        return Constants.OPTIONAL_INT_VALUE;
+    }
+
+    /**
+     * Gets the appointment.
+     *
+     * @param nIdResourceHistory the n id resource history
+     * @return the appointment
+     */
+    public Appointment getAppointment( int nIdResourceHistory )
+    {
+        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
+
+        return appointment;
+    }
+
+    /**
+     * Gets the order phone number.
+     *
+     * @return the order phone number
+     */
+    public int getOrderPhoneNumber(  )
+    {
+        return _nOrderPhoneNumber;
+    }
+
+    /**
+     * Sets the order phone number.
+     *
+     * @param nOrderPhoneNumber the new order phone number
+     */
+    public void setOrderPhoneNumber( int nOrderPhoneNumber )
+    {
+        _nOrderPhoneNumber = nOrderPhoneNumber;
+    }
 }
