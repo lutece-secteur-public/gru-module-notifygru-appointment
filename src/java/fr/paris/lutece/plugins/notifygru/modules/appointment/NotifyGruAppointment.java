@@ -296,4 +296,17 @@ public class NotifyGruAppointment extends AbstractServiceProvider
     {
         _nOrderPhoneNumber = nOrderPhoneNumber;
     }
+
+    @Override
+    public String getDemandReference( int nIdResourceHistory ) 
+    {
+         return "Nothing";
+    }
+
+    @Override
+    public String getCustomerId( int nIdResourceHistory ) 
+    {
+       
+        return "Nothing";
+    }
 }
