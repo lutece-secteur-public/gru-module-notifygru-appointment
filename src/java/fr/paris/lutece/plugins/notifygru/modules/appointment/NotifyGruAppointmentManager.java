@@ -41,11 +41,17 @@ import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
+import fr.paris.lutece.plugins.workflow.business.action.ActionDAO;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.utils.constants.Constants;
+import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
 import java.util.HashMap;
@@ -60,7 +66,7 @@ import javax.inject.Inject;
 /**
  * The Class NotifyGruAppointment.
  */
-public class NotifyGruAppointment extends AbstractServiceProvider
+public class NotifyGruAppointmentManager extends AbstractServiceProvider
 {
     
     /** The Constant MARK_LIST_RESPONSE. */
@@ -79,9 +85,18 @@ public class NotifyGruAppointment extends AbstractServiceProvider
     /** The Constant MARK_ENTRY_BASE. */
     private static final String MARK_ENTRY_BASE = "reponse_";
     
+    private static final String TITLE_I18NKEY = "module.notifygru.appointment.module.providerappointment";
+    private static final String PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER = "notifygru-appointment.config.provider.PositionDemandType";
+    
     /** The Constant TEMPLATE_INFOS_HELP. */
     private static final String TEMPLATE_INFOS_HELP = "admin/plugins/workflow/modules/notifygru/appointment/freemarker_list.html";
 
+      @Inject
+    private ActionDAO _actionDAO;
+
+    public static Map<String, NotifyGruAppointmentManager> _listProviderNotifyGruManager;
+    
+      private static String _strKey = "notifygru-appointment.ProviderService.@.";
     /** The _resource history service. */
     // SERVICES
     @Inject
@@ -308,5 +323,71 @@ public class NotifyGruAppointment extends AbstractServiceProvider
     {
        
         return "Nothing";
+    }
+
+    @Override
+    public void updateListProvider(ITask task) {
+        
+          List<AppointmentForm> listAppointmentForms = AppointmentFormHome.getAppointmentFormsList(  );
+          if (_listProviderNotifyGruManager == null) {
+            _listProviderNotifyGruManager = new HashMap<String, NotifyGruAppointmentManager>();
+        }
+
+        for (AppointmentForm appointment : listAppointmentForms) {
+
+            String strKeyProvider = _strKey + appointment.getIdForm();
+            String strBeanName = _strKey + appointment.getIdForm();
+
+            Action action = _actionDAO.load(task.getAction().getId());
+
+            Workflow wf = action.getWorkflow();
+            if (!_listProviderNotifyGruManager.containsKey(strKeyProvider) && appointment.getIsActive() && wf.getId() == appointment.getIdWorkflow()) {
+              
+                NotifyGruAppointmentManager provider = new NotifyGruAppointmentManager();
+                provider._resourceHistoryService = _resourceHistoryService;
+                provider._actionDAO = _actionDAO;
+             
+
+                provider.setBeanName(strBeanName);
+                provider.setKey(strKeyProvider);
+                provider.settitleI18nKey(TITLE_I18NKEY);
+                provider.setIdFormAppointment(appointment.getIdForm());
+
+                provider.setOrderPhoneNumber(AppPropertiesService.getPropertyInt(PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER, 0));
+              
+                _listProviderNotifyGruManager.put(strKeyProvider, provider);
+            }
+            //
+        }
+      
+    }
+
+    @Override
+    public ReferenceList buildReferenteListProvider()
+    {
+        ReferenceList refenreceList = new ReferenceList();
+
+        for (Map.Entry<String, NotifyGruAppointmentManager> entrySet : _listProviderNotifyGruManager.entrySet()) {
+            String key = entrySet.getKey();
+            NotifyGruAppointmentManager provider = entrySet.getValue();
+
+           // AppointmentForm directory = AppointmentFormHome.findByPrimaryKey(provider.getIdDirectory(), _pluginDirectory);
+            AppointmentForm appointment = AppointmentFormHome.findByPrimaryKey(provider.getIdFormAppointment());
+
+            refenreceList.addItem(provider.getBeanName(), provider.getTitle(Locale.getDefault()) + " : " + appointment.getTitle());
+        }
+
+        return refenreceList;
+
+    }
+
+    @Override
+    public Boolean isKeyProvider(String strKey) {
+         return (_listProviderNotifyGruManager == null) ? false : _listProviderNotifyGruManager.containsKey(strKey);
+    }
+
+    @Override
+    public AbstractServiceProvider getInstanceProvider(String strKey) {
+         return _listProviderNotifyGruManager.get(strKey);
     }
 }
