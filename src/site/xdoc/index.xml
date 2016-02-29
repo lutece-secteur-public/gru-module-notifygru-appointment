@@ -1,24 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
     <properties>
-        <title>Plugin providerappointment</title>
+        <title>       
+          Module NotifyGru Appointment : Provider (module) of NotifyGru module 
+           
+        </title>
     </properties>
     <body>
-        <section name="Plugin providerappointment">
-            <!--
-            <p>
-                <img src="images/providerappointment.png" />
+        <section name="Module NotifyGru Appointment">
+           
+             <subsection name="Introduction">
+            The resource provider (appointment) Appointment NotifyGru makes the link between the task and the Appointment NotifyGru plugin.
+             Indeed, NotifyGru is designed to operate with any implementation of the abstract class
+            <code>fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider</code> Itself implements the interface
+             <code>fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider</code> which defines the basic methods of providers.
+          </subsection>
+           
+            <subsection name="Implementation">
+                <p>Module Notify Gru Appointment Manager is implemented resource providers (appointment), 
+                that is to say, only one instance of a manager provides for each appointment form, a provider instance.
+                     This has the consequence of having a property value <code>managerProvider</code>always<code>FALSE</code>
+                 to indicate that we have a manager provider instance of this service</p>
+             
+              <p>In the context file, we like reporting BEAN :
+           <code>     <bean id="notifygru-appointment.ProviderService"  
+    	class="fr.paris.lutece.plugins.notifygru.modules.appointment.NotifyGruAppointmentManager" 
+    	p:key="notifygru-appointment.ProviderService"
+ 		p:titleI18nKey="module.notifygru.appointment.module.providerappointment"
+        p:beanName="notifygru-appointment.ProviderService"    
+         p:managerProvider="true" 
+    />  
+    </code>            
             </p>
-            -->
-            <subsection name="Introduction">
-                <p></p>
+            
             </subsection>
+            
+            
+            
             <subsection name="Configuration">
-                <p></p>
+              <p></p>
+ 
             </subsection>
-            <subsection name="Usage">
-                <p></p>
+            
+            <subsection name="Provider use">
+                <p>When the task is originally created and the selected provider, the instance of the latter gives the information available via bookmarks..
+                 These bookmarks can be used to set messages or objects of different tabs :  </p>
+                 
+                 <p>For all appointment forms, we have these common bookmarks :</p>
+                <ul>
+           
+<li>First name of the user 		${firstName} </li>
+<li>User name	${lastName} </li>
+<li>Email User 	${email} </li>
+
+
+                </ul>
+                
+                <p>Then we may have additional bookmarks from the built form in each appointment :</p>
+                <ul>
+           
+<li>title field 1 	${reponse_1}</li>
+<li>title field 2 	${reponse_2}</li>
+<li>.........</li>
+<li>title field n 	${reponse_n}</li>
+
+
+
+                </ul>
+                
+                
+                   <p>When performing the task NotifyGru, the provider instance provides all the necessary information to build the JSON stream.</p>
             </subsection>
+            
         </section>
     </body>
 </document>

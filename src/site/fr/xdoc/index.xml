@@ -1,24 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
     <properties>
-        <title>Plugin providerappointment</title>
+        <title>       
+          Module NotifyGru Appointment : Fournisseur (module) du module NotifyGru
+           
+        </title>
     </properties>
     <body>
-        <section name="Plugin providerappointment">
-            <!--
-            <p>
-                <img src="images/providerappointment.png" />
+        <section name="Module NotifyGru Appointment">
+           
+             <subsection name="Introduction">
+             Le fournisseur de ressource (appointment) NotifyGru Appointment fait le lien entre la tâche NotifyGru et le plugin Appointment.
+             En effet, NotifyGru est conçu pour fonctionner avec une quelconque implémentation de la classe abstraite 
+             <code>fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider</code> Lui-même implémentant l'interface 
+             <code>fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider</code> qui définit les méthodes de base des fournisseurs.
+          </subsection>
+           
+            <subsection name="Implémentation">
+                <p>Le Module NotifyGru Appointment est implémenté en gestionnaire de fournisseurs de ressource (appointment), c'est-à-dire qu'une seule instance d'un gestionnaire fournit pour
+                chaque formulaire de rendez-vous, une instance de fournisseur.  Ceci a pour conséquence d'avoir une valeur de la propriété <code>managerProvider</code> toujours <code>TRUE</code>
+                 pour indiquer que nous avons un gestionnaire de ce service</p>
+             
+             <p>Dans le fichier context, nous aurons comme déclaration de BEAN :
+           <code>     <bean id="notifygru-appointment.ProviderService"  
+    	class="fr.paris.lutece.plugins.notifygru.modules.appointment.NotifyGruAppointmentManager" 
+    	p:key="notifygru-appointment.ProviderService"
+ 		p:titleI18nKey="module.notifygru.appointment.module.providerappointment"
+        p:beanName="notifygru-appointment.ProviderService"    
+         p:managerProvider="true" 
+    />  
+    </code>            
             </p>
-            -->
-            <subsection name="Introduction">
-                <p></p>
+            
             </subsection>
+            
+            
+            
             <subsection name="Configuration">
-                <p></p>
+              <p></p>
+ 
             </subsection>
-            <subsection name="Usage">
-                <p></p>
+            
+            <subsection name="Utilisation du fournisseur">
+                <p>Lorsque la tâche est initialement créée et le fournisseur choisi, l'instance de celui-ci donne les informations disponibles via des signets.
+                 Ces signets pourront être utilisés pour paramétrer les messages ou les objets des différents onglets.</p>
+                 
+                 <p>Pour tous les formulaires de rendez-vous, nous avons ces signets communs :</p>
+                <ul>
+           
+<li>Prénom de l'utilisateur  		${firstName} </li>
+<li>Nom de famille de l'utilisateur  	${lastName} </li>
+<li>Email de l'utilisateur  	${email} </li>
+
+
+                </ul>
+                
+                <p>Ensuite, on peut avoir des signets suppléentaires provenant du formulaire intégré dans chaque Appointment :</p>
+                <ul>
+           
+<li>titre champ 1 	${reponse_1}</li>
+<li>titre champ 2 	${reponse_2}</li>
+<li>.........</li>
+<li>titre champ n 	${reponse_n}</li>
+
+
+
+                </ul>
+                
+                
+                <p>Lors de l'exécution de la tâche NotifyGru, l'instance du fournisseur donne toutes les informations nécessaires pour la construction du flux JSON.</p>
             </subsection>
+            
         </section>
     </body>
 </document>
