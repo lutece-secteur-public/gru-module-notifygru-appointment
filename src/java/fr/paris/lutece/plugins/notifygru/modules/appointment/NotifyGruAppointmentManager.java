@@ -62,49 +62,45 @@ import java.util.Map;
 import javax.inject.Inject;
 
 
-
 /**
  * The Class NotifyGruAppointment.
  */
 public class NotifyGruAppointmentManager extends AbstractServiceProvider
 {
-    
+    private static Map<String, NotifyGruAppointmentManager> _listProviderNotifyGruManager;
+    private static String _strKey = "notifygru-appointment.ProviderService.@.";
+
     /** The Constant MARK_LIST_RESPONSE. */
     // MARKS   
     private static final String MARK_LIST_RESPONSE = "listEntry";
-    
+
     /** The Constant MARK_FIRSTNAME. */
     private static final String MARK_FIRSTNAME = "firstName";
-    
+
     /** The Constant MARK_LASTNAME. */
     private static final String MARK_LASTNAME = "lastName";
-    
+
     /** The Constant MARK_EMAIL. */
     private static final String MARK_EMAIL = "email";
-    
+
     /** The Constant MARK_ENTRY_BASE. */
     private static final String MARK_ENTRY_BASE = "reponse_";
-    
     private static final String TITLE_I18NKEY = "module.notifygru.appointment.module.providerappointment";
     private static final String PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER = "notifygru-appointment.config.provider.PositionDemandType";
-    
+
     /** The Constant TEMPLATE_INFOS_HELP. */
     private static final String TEMPLATE_INFOS_HELP = "admin/plugins/workflow/modules/notifygru/appointment/freemarker_list.html";
 
-      @Inject
-    private ActionDAO _actionDAO;
-
-    public static Map<String, NotifyGruAppointmentManager> _listProviderNotifyGruManager;
-    
-      private static String _strKey = "notifygru-appointment.ProviderService.@.";
     /** The _resource history service. */
     // SERVICES
     @Inject
     private IResourceHistoryService _resourceHistoryService;
-    
+    @Inject
+    private ActionDAO _actionDAO;
+
     /** The _nid form appointment. */
     private int _nidFormAppointment;
-    
+
     /** The _n order phone number. */
     private int _nOrderPhoneNumber;
 
@@ -313,81 +309,87 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     }
 
     @Override
-    public String getDemandReference( int nIdResourceHistory ) 
+    public String getDemandReference( int nIdResourceHistory )
     {
-         return "Nothing";
-    }
-
-    @Override
-    public String getCustomerId( int nIdResourceHistory ) 
-    {
-       
         return "Nothing";
     }
 
     @Override
-    public void updateListProvider(ITask task) {
-        
-          List<AppointmentForm> listAppointmentForms = AppointmentFormHome.getAppointmentFormsList(  );
-          if (_listProviderNotifyGruManager == null) {
-            _listProviderNotifyGruManager = new HashMap<String, NotifyGruAppointmentManager>();
-        }
-
-        for (AppointmentForm appointment : listAppointmentForms) {
-
-            String strKeyProvider = _strKey + appointment.getIdForm();
-            String strBeanName = _strKey + appointment.getIdForm();
-
-            Action action = _actionDAO.load(task.getAction().getId());
-
-            Workflow wf = action.getWorkflow();
-            if (!_listProviderNotifyGruManager.containsKey(strKeyProvider) && appointment.getIsActive() && wf.getId() == appointment.getIdWorkflow()) {
-              
-                NotifyGruAppointmentManager provider = new NotifyGruAppointmentManager();
-                provider._resourceHistoryService = _resourceHistoryService;
-                provider._actionDAO = _actionDAO;
-             
-
-                provider.setBeanName(strBeanName);
-                provider.setKey(strKeyProvider);
-                provider.settitleI18nKey(TITLE_I18NKEY);
-                provider.setIdFormAppointment(appointment.getIdForm());
-
-                provider.setOrderPhoneNumber(AppPropertiesService.getPropertyInt(PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER, 0));
-              
-                _listProviderNotifyGruManager.put(strKeyProvider, provider);
-            }
-            //
-        }
-      
+    public String getCustomerId( int nIdResourceHistory )
+    {
+        return "Nothing";
     }
 
     @Override
-    public ReferenceList buildReferenteListProvider()
+    public void updateListProvider( ITask task )
     {
-        ReferenceList refenreceList = new ReferenceList();
+        List<AppointmentForm> listAppointmentForms = AppointmentFormHome.getAppointmentFormsList(  );
 
-        for (Map.Entry<String, NotifyGruAppointmentManager> entrySet : _listProviderNotifyGruManager.entrySet()) {
-            String key = entrySet.getKey();
-            NotifyGruAppointmentManager provider = entrySet.getValue();
+        if ( _listProviderNotifyGruManager == null )
+        {
+            _listProviderNotifyGruManager = new HashMap<String, NotifyGruAppointmentManager>(  );
+        }
 
-           // AppointmentForm directory = AppointmentFormHome.findByPrimaryKey(provider.getIdDirectory(), _pluginDirectory);
-            AppointmentForm appointment = AppointmentFormHome.findByPrimaryKey(provider.getIdFormAppointment());
+        for ( AppointmentForm appointment : listAppointmentForms )
+        {
+            String strKeyProvider = _strKey + appointment.getIdForm(  );
+            String strBeanName = _strKey + appointment.getIdForm(  );
 
-            refenreceList.addItem(provider.getBeanName(), provider.getTitle(Locale.getDefault()) + " : " + appointment.getTitle());
+            Action action = _actionDAO.load( task.getAction(  ).getId(  ) );
+
+            Workflow wf = action.getWorkflow(  );
+
+            if ( !_listProviderNotifyGruManager.containsKey( strKeyProvider ) && appointment.getIsActive(  ) &&
+                    ( wf.getId(  ) == appointment.getIdWorkflow(  ) ) )
+            {
+                NotifyGruAppointmentManager provider = new NotifyGruAppointmentManager(  );
+                provider._resourceHistoryService = _resourceHistoryService;
+                provider._actionDAO = _actionDAO;
+
+                provider.setBeanName( strBeanName );
+                provider.setKey( strKeyProvider );
+                provider.settitleI18nKey( TITLE_I18NKEY );
+                provider.setIdFormAppointment( appointment.getIdForm(  ) );
+
+                provider.setOrderPhoneNumber( AppPropertiesService.getPropertyInt( 
+                        PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER, 0 ) );
+
+                _listProviderNotifyGruManager.put( strKeyProvider, provider );
+            }
+
+            //
+        }
+    }
+
+    @Override
+    public ReferenceList buildReferenteListProvider(  )
+    {
+        ReferenceList refenreceList = new ReferenceList(  );
+
+        for ( Map.Entry<String, NotifyGruAppointmentManager> entrySet : _listProviderNotifyGruManager.entrySet(  ) )
+        {
+            String key = entrySet.getKey(  );
+            NotifyGruAppointmentManager provider = entrySet.getValue(  );
+
+            // AppointmentForm directory = AppointmentFormHome.findByPrimaryKey(provider.getIdDirectory(), _pluginDirectory);
+            AppointmentForm appointment = AppointmentFormHome.findByPrimaryKey( provider.getIdFormAppointment(  ) );
+
+            refenreceList.addItem( provider.getBeanName(  ),
+                provider.getTitle( Locale.getDefault(  ) ) + " : " + appointment.getTitle(  ) );
         }
 
         return refenreceList;
-
     }
 
     @Override
-    public Boolean isKeyProvider(String strKey) {
-         return (_listProviderNotifyGruManager == null) ? false : _listProviderNotifyGruManager.containsKey(strKey);
+    public Boolean isKeyProvider( String strKey )
+    {
+        return ( _listProviderNotifyGruManager == null ) ? false : _listProviderNotifyGruManager.containsKey( strKey );
     }
 
     @Override
-    public AbstractServiceProvider getInstanceProvider(String strKey) {
-         return _listProviderNotifyGruManager.get(strKey);
+    public AbstractServiceProvider getInstanceProvider( String strKey )
+    {
+        return _listProviderNotifyGruManager.get( strKey );
     }
 }
