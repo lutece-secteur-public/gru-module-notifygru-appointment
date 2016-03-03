@@ -37,6 +37,8 @@ import fr.paris.lutece.plugins.appointment.business.Appointment;
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 import fr.paris.lutece.plugins.appointment.business.AppointmentFormHome;
 import fr.paris.lutece.plugins.appointment.business.AppointmentHome;
+import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlot;
+import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlotHome;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
@@ -85,9 +87,17 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
     /** The Constant MARK_LASTNAME. */
     private static final String MARK_LASTNAME = "lastName";
+    private static final String MARK_DATE_APOINTMENT = "date_appointment";
+    private static final String MARK_TIME_APOINTMENT = "time_appointment";
+    private static final String MARK_REFERENCE = "reference";
+    private static final String MARK_RECAP = "recap";
+    private static final String MARK_URL_CANCEL = "url_cancel";
 
     /** The Constant MARK_EMAIL. */
     private static final String MARK_EMAIL = "email";
+
+    
+    private static final String PARAMS_URL = "/jsp/site/Portal.jsp?page=appointment&view=getViewCancelAppointment&dateAppointment=22/12/15&refAppointment=15803b59c5";
 
     /** The Constant MARK_ENTRY_BASE. */
     private static final String MARK_ENTRY_BASE = "reponse_";
@@ -201,11 +211,23 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
         {
             ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
             Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-
+            AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment() );
+            
+            AppointmentSlot appointmentSlot = AppointmentSlotHome.findByPrimaryKey( appointment.getIdSlot(  ) );
+            
             model.put( MARK_FIRSTNAME, appointment.getFirstName(  ) );
             model.put( MARK_LASTNAME, appointment.getLastName(  ) );
             model.put( MARK_EMAIL, appointment.getEmail(  ) );
-
+            model.put( MARK_DATE_APOINTMENT, appointment.getDateAppointment( ));
+            model.put( MARK_TIME_APOINTMENT, appointmentSlot.getStartingHour( )+" : "+appointmentSlot.getStartingMinute( ));
+           
+            model.put( MARK_REFERENCE, appointmentForm.getReference() );
+            model.put( MARK_URL_CANCEL, PARAMS_URL);
+            model.put( MARK_RECAP, "Nom : "+appointment.getFirstName()+", Prénom : "+appointment.getLastName( )+", Email : "+appointment.getEmail( ));
+          
+            
+          //  appointment.
+            
             List<Response> listResponses = AppointmentHome.findListResponse( appointment.getIdAppointment(  ) );
 
             for ( Response response : listResponses )
@@ -219,6 +241,12 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             model.put( MARK_FIRSTNAME, "" );
             model.put( MARK_LASTNAME, "" );
             model.put( MARK_EMAIL, "" );
+            
+            model.put( MARK_DATE_APOINTMENT, "");
+            model.put( MARK_TIME_APOINTMENT, "");           
+            model.put( MARK_REFERENCE, "" );
+            model.put( MARK_URL_CANCEL, "url");
+            model.put( MARK_RECAP, "recap" );
 
             AppointmentForm formAppointment = AppointmentFormHome.findByPrimaryKey( _nidFormAppointment );
             EntryFilter entryFilter = new EntryFilter(  );
