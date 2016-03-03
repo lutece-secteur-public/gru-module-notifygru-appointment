@@ -18,4 +18,6 @@
         p:beanName="notifygru-appointment.ProviderService"    
          p:managerProvider="true" 
     />  
+    
+       <bean id="notifygru-appointment.DefaultDemandTypeService" class="fr.paris.lutece.plugins.notifygru.modules.appointment.services.DefaultDemandTypeService" />
 </beans>

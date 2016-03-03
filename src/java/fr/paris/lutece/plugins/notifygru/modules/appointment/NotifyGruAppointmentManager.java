@@ -41,6 +41,7 @@ import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
+import fr.paris.lutece.plugins.notifygru.modules.appointment.services.IDemandTypeService;
 import fr.paris.lutece.plugins.workflow.business.action.ActionDAO;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.utils.constants.Constants;
@@ -49,7 +50,11 @@ import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.portal.service.security.LuteceUser;
+import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -69,7 +74,8 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 {
     private static Map<String, NotifyGruAppointmentManager> _listProviderNotifyGruManager;
     private static String _strKey = "notifygru-appointment.ProviderService.@.";
-
+    private static IDemandTypeService _beanDemandTypeService;
+    private static final String BEAN_SERVICE_DEMAND_TYPE = "notifygru-appointment.DefaultDemandTypeService";
     /** The Constant MARK_LIST_RESPONSE. */
     // MARKS   
     private static final String MARK_LIST_RESPONSE = "listEntry";
@@ -117,19 +123,18 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
         return strEmail;
     }
-
+   
     /* (non-Javadoc)
      * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getUserGuid(int)
      */
     @Override
     public String getUserGuid( int nIdResourceHistory )
     {
-        String strIdUser = "";
+        String strGUID = "";
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-        strIdUser = appointment.getIdUser(  );
-
-        return strIdUser;
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );        
+        strGUID = appointment.getIdUser(  );        
+        return strGUID;
     }
 
     /* (non-Javadoc)
@@ -271,7 +276,20 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public int getOptionalDemandIdType( int nIdResourceHistory )
     {
-        return Constants.OPTIONAL_INT_VALUE;
+    	
+    	 AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment() );
+    	 
+    	 if ( _beanDemandTypeService == null )
+         {
+             _beanDemandTypeService = SpringContextService.getBean( BEAN_SERVICE_DEMAND_TYPE );
+         }
+
+         int nDemandType = _beanDemandTypeService.getDemandType( appointmentForm );       
+         AppLogService.info("DemandTypeId : " + nDemandType);
+
+         return nDemandType;
+         
+     
     }
 
     /**
@@ -284,7 +302,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     {
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
         Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-
+       
         return appointment;
     }
 
@@ -311,12 +329,36 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public String getDemandReference( int nIdResourceHistory )
     {
-        return "Nothing";
+    
+        AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment() );
+      
+        return appointmentForm.getReference();
     }
 
     @Override
     public String getCustomerId( int nIdResourceHistory )
     {
+    	
+    	
+    	/*//if guid is provided => we try to retrieve linked customer
+                gruCustomer = CustomerService.instance(  ).getCustomerByGuid( ticket.getGuid(  ) );
+                userDto = UserInfoService.instance(  ).getUserInfo( strGuidFromTicket );
+            }
+
+            if ( gruCustomer == null )
+            {
+                //customer is unknown / not found => we create it
+                if ( userDto == null )
+                {
+                    userDto = buildUserFromTicket( ticket );
+                }
+
+                //create customer
+                gruCustomer = CustomerService.instance(  ).createCustomer( buildCustomer( userDto, strGuidFromTicket ) );
+                AppLogService.info( "New user created the guid : <" + strGuidFromTicket + "> its customer id is : <" +
+                    gruCustomer.getId(  ) + ">" );
+            }
+    	 * */
         return "Nothing";
     }
 
