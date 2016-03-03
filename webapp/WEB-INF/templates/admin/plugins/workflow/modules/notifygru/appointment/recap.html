@@ -1,0 +1,20 @@
+<p>
+   ${appointment.lastName}
+</p>
+<p>
+${appointment.firstName}
+</p>
+<p >
+   ${appointment.email}
+</p>
+<p >
+   ${appointment.dateAppointment} 
+   #i18n{appointment.appointmentApp.labelTimeAppointmentFrom}
+   <#if slot.startingHour &lt; 10 >0</#if>
+   ${slot.startingHour}h
+   <#if slot.startingMinute &lt; 10>0</#if>
+   ${slot.startingMinute}
+   #i18n{appointment.appointmentApp.labelTimeAppointmentTo} 
+   <#if slot.endingHour &lt; 10 >0</#if>${slot.endingHour}h<#if slot.endingMinute &lt; 10>0</#if>
+   ${slot.endingMinute}
+</p>

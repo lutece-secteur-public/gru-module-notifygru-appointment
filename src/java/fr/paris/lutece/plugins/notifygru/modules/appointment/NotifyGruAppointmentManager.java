@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.appointment.business.AppointmentFormHome;
 import fr.paris.lutece.plugins.appointment.business.AppointmentHome;
 import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlot;
 import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlotHome;
+import fr.paris.lutece.plugins.appointment.web.AppointmentApp;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
@@ -96,9 +97,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     /** The Constant MARK_EMAIL. */
     private static final String MARK_EMAIL = "email";
 
-    
-    private static final String PARAMS_URL = "/jsp/site/Portal.jsp?page=appointment&view=getViewCancelAppointment&dateAppointment=22/12/15&refAppointment=15803b59c5";
-
+  
     /** The Constant MARK_ENTRY_BASE. */
     private static final String MARK_ENTRY_BASE = "reponse_";
     private static final String TITLE_I18NKEY = "module.notifygru.appointment.module.providerappointment";
@@ -106,6 +105,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
     /** The Constant TEMPLATE_INFOS_HELP. */
     private static final String TEMPLATE_INFOS_HELP = "admin/plugins/workflow/modules/notifygru/appointment/freemarker_list.html";
+    private static final String TEMPLATE_INFOS_RECAP= "admin/plugins/workflow/modules/notifygru/appointment/recap.html";
 
     /** The _resource history service. */
     // SERVICES
@@ -222,10 +222,20 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             model.put( MARK_TIME_APOINTMENT, appointmentSlot.getStartingHour( )+" : "+appointmentSlot.getStartingMinute( ));
            
             model.put( MARK_REFERENCE, appointmentForm.getReference() );
-            model.put( MARK_URL_CANCEL, PARAMS_URL);
-            model.put( MARK_RECAP, "Nom : "+appointment.getFirstName()+", Prénom : "+appointment.getLastName( )+", Email : "+appointment.getEmail( ));
-          
+            model.put( MARK_URL_CANCEL,  AppointmentApp.getCancelAppointmentUrl( appointment ) );
             
+   Map<String, Object> modelRecap = new HashMap<String, Object>(  );
+   modelRecap.put("appointment", appointment);
+   modelRecap.put("slot", appointmentSlot);
+            
+            HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
+            		TEMPLATE_INFOS_RECAP, Locale.getDefault(), modelRecap ).getHtml(  ), Locale.getDefault(), modelRecap );
+
+        String strRecap= t.getHtml(  );
+            
+            model.put( MARK_RECAP,strRecap);
+          
+         
           //  appointment.
             
             List<Response> listResponses = AppointmentHome.findListResponse( appointment.getIdAppointment(  ) );
@@ -245,8 +255,8 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             model.put( MARK_DATE_APOINTMENT, "");
             model.put( MARK_TIME_APOINTMENT, "");           
             model.put( MARK_REFERENCE, "" );
-            model.put( MARK_URL_CANCEL, "url");
-            model.put( MARK_RECAP, "recap" );
+            model.put( MARK_URL_CANCEL, "");
+            model.put( MARK_RECAP, "" );
 
             AppointmentForm formAppointment = AppointmentFormHome.findByPrimaryKey( _nidFormAppointment );
             EntryFilter entryFilter = new EntryFilter(  );
