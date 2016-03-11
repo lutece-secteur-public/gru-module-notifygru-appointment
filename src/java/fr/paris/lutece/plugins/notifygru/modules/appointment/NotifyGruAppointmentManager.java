@@ -62,6 +62,8 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -222,7 +224,12 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             model.put( MARK_TIME_APOINTMENT, appointmentSlot.getStartingHour( )+" : "+appointmentSlot.getStartingMinute( ));
            
             model.put( MARK_REFERENCE, appointmentForm.getReference() );
-            model.put( MARK_URL_CANCEL,  AppointmentApp.getCancelAppointmentUrl( appointment ) );
+            
+            String strUrlCancel = "/";
+            strUrlCancel = AppointmentApp.getCancelAppointmentUrl( appointment ) ;	
+            
+            
+            model.put( MARK_URL_CANCEL, strUrlCancel.replaceAll("&", "&amp;") );
             
    Map<String, Object> modelRecap = new HashMap<String, Object>(  );
    modelRecap.put("appointment", appointment);
@@ -275,6 +282,8 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
         return model;
     }
+    
+    
 
     /**
      * Gets the id form appointment.
@@ -370,7 +379,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     
         AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment() );
       
-        return appointmentForm.getReference();
+        return appointmentForm.getReference(); 
     }
 
     @Override
