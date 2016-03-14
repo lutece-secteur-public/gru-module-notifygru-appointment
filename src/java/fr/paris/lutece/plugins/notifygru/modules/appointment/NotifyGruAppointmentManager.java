@@ -95,6 +95,8 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     private static final String MARK_REFERENCE = "reference";
     private static final String MARK_RECAP = "recap";
     private static final String MARK_URL_CANCEL = "url_cancel";
+    private static final String MARK_APPOINTMENT = "appointment";
+    private static final String MARK_SLOT = "slot";
 
     /** The Constant MARK_EMAIL. */
     private static final String MARK_EMAIL = "email";
@@ -231,9 +233,9 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             
             model.put( MARK_URL_CANCEL, strUrlCancel.replaceAll("&", "&amp;") );
             
-   Map<String, Object> modelRecap = new HashMap<String, Object>(  );
-   modelRecap.put("appointment", appointment);
-   modelRecap.put("slot", appointmentSlot);
+            Map<String, Object> modelRecap = new HashMap<String, Object>(  );
+            modelRecap.put( MARK_APPOINTMENT, appointment );
+            modelRecap.put( MARK_SLOT, appointmentSlot );
             
             HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
             		TEMPLATE_INFOS_RECAP, Locale.getDefault(), modelRecap ).getHtml(  ), Locale.getDefault(), modelRecap );
@@ -376,10 +378,11 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public String getDemandReference( int nIdResourceHistory )
     {
-    
+      ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
         AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment() );
       
-        return appointmentForm.getReference(); 
+        return appointmentForm.getReference()+'-'+appointment.getIdAppointment(); 
     }
 
     @Override
