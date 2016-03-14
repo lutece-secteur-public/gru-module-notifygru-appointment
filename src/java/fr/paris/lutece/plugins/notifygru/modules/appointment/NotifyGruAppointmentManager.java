@@ -223,7 +223,8 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             model.put( MARK_LASTNAME, appointment.getLastName(  ) );
             model.put( MARK_EMAIL, appointment.getEmail(  ) );
             model.put( MARK_DATE_APOINTMENT, appointment.getDateAppointment( ));
-            model.put( MARK_TIME_APOINTMENT, appointmentSlot.getStartingHour( )+" : "+appointmentSlot.getStartingMinute( ));
+            int nMinute=appointmentSlot.getStartingMinute( );
+            model.put( MARK_TIME_APOINTMENT, appointmentSlot.getStartingHour( )+"h : "+( ( nMinute == 0 )? "00": nMinute )+" mn");
            
             model.put( MARK_REFERENCE, appointmentForm.getReference() );
             
