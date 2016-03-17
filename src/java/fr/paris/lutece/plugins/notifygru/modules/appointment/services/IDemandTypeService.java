@@ -33,10 +33,7 @@
  */
 package fr.paris.lutece.plugins.notifygru.modules.appointment.services;
 
-
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
-
-
 
 
 // TODO: Auto-generated Javadoc
@@ -45,7 +42,6 @@ import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
  */
 public interface IDemandTypeService
 {
-   
     /**
      * Gets the demand type.
      *

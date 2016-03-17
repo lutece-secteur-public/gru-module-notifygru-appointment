@@ -33,8 +33,6 @@
  */
 package fr.paris.lutece.plugins.notifygru.modules.appointment.services;
 
-
-
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
@@ -48,7 +46,6 @@ public class DefaultDemandTypeService implements IDemandTypeService
     /** The params config. */
     public static final String PARAMS_CONFIG = "workflow-appointment.demandType.AppointmentType.";
 
-    
     /* (non-Javadoc)
      * @see fr.paris.lutece.plugins.notifygru.modules.appointment.services.IDemandTypeService#getDemandType(fr.paris.lutece.plugins.appointment.business.AppointmentForm)
      */
@@ -59,7 +56,7 @@ public class DefaultDemandTypeService implements IDemandTypeService
 
         if ( appointmentForm != null )
         {
-            int nIdType = appointmentForm.getIdForm( );
+            int nIdType = appointmentForm.getIdForm(  );
             nDemandType = AppPropertiesService.getPropertyInt( PARAMS_CONFIG + nIdType, nIdType );
         }
 
