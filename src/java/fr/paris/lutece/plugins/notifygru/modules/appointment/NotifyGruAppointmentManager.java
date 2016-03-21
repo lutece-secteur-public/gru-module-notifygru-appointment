@@ -220,10 +220,16 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             model.put( MARK_DATE_APOINTMENT, appointment.getDateAppointment(  ) );
 
             int nMinute = appointmentSlot.getStartingMinute(  );
+            String strPrefixMinute = "";
+            if( nMinute < 10 )
+            {
+            	strPrefixMinute = "0";
+            }
+           
             model.put( MARK_TIME_APOINTMENT,
-                appointmentSlot.getStartingHour(  ) + "h : " + ( ( nMinute == 0 ) ? "00" : nMinute ) + " mn" );
+                appointmentSlot.getStartingHour(  ) + "h:" +strPrefixMinute+nMinute + "mn" );
 
-            model.put( MARK_REFERENCE, appointmentForm.getReference(  ) );
+            model.put( MARK_REFERENCE, appointmentForm.getReference(  ) + '-' + appointment.getIdAppointment(  ) );
 
             String strUrlCancel = "/";
             strUrlCancel = AppointmentApp.getCancelAppointmentUrl( appointment );
@@ -398,7 +404,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
                     gruCustomer.getId(  ) + ">" );
             }
              * */
-        return "Nothing";
+        return "";
     }
 
     @Override
