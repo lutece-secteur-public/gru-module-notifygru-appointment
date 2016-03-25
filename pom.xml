@@ -29,12 +29,15 @@
             <version>[5.0.0,)</version>
             <type>lutece-core</type>
         </dependency>
+        
         <dependency>
-            <groupId>fr.paris.lutece.plugins</groupId>
-            <artifactId>plugin-appointment</artifactId>
-            <version>[1.0.0,)</version>
+           <groupId>fr.paris.lutece.plugins</groupId>
+           <artifactId>module-appointmentgru</artifactId>
+           <version>[1.0.0-SNAPSHOT,)</version>
             <type>lutece-plugin</type>
         </dependency>
+
+    
         <dependency>
             <groupId>fr.paris.lutece.plugins</groupId>
             <artifactId>module-workflow-notifygru</artifactId>

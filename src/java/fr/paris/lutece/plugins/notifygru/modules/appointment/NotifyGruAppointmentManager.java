@@ -40,6 +40,8 @@ import fr.paris.lutece.plugins.appointment.business.AppointmentHome;
 import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlot;
 import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlotHome;
 import fr.paris.lutece.plugins.appointment.web.AppointmentApp;
+import fr.paris.lutece.plugins.appointmentgru.business.AppointmentGru;
+import fr.paris.lutece.plugins.appointmentgru.services.AppointmentGruService;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
@@ -140,8 +142,10 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     {
         String strGUID = "";
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-        strGUID = appointment.getIdUser(  );
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );        
+        AppointmentGru appointmentGru = AppointmentGruService.getService().getAppointmentGru(appointment);
+        
+        strGUID = appointmentGru.getGuid();
 
         return strGUID;
     }
@@ -156,19 +160,9 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
         Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
 
-        List<Response> listResponses = AppointmentHome.findListResponse( appointment.getIdAppointment(  ) );
+       AppointmentGru appointmentGru = AppointmentGruService.getService().getAppointmentGru(appointment);
 
-        for ( Response response : listResponses )
-        {
-            Entry entry = EntryHome.findByPrimaryKey( response.getEntry(  ).getIdEntry(  ) );
-
-            if ( entry.getPosition(  ) == getOrderPhoneNumber(  ) )
-            {
-                strPhoneNumber = response.getResponseValue(  );
-            }
-        }
-
-        return strPhoneNumber;
+        return appointmentGru.getMobilePhoneNumber();
     }
 
     /* (non-Javadoc)
@@ -385,26 +379,11 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public String getCustomerId( int nIdResourceHistory )
     {
-        /*//if guid is provided => we try to retrieve linked customer
-                gruCustomer = CustomerService.instance(  ).getCustomerByGuid( ticket.getGuid(  ) );
-                userDto = UserInfoService.instance(  ).getUserInfo( strGuidFromTicket );
-            }
-
-            if ( gruCustomer == null )
-            {
-                //customer is unknown / not found => we create it
-                if ( userDto == null )
-                {
-                    userDto = buildUserFromTicket( ticket );
-                }
-
-                //create customer
-                gruCustomer = CustomerService.instance(  ).createCustomer( buildCustomer( userDto, strGuidFromTicket ) );
-                AppLogService.info( "New user created the guid : <" + strGuidFromTicket + "> its customer id is : <" +
-                    gruCustomer.getId(  ) + ">" );
-            }
-             * */
-        return "";
+          ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
+        AppointmentGru appointmentGru = AppointmentGruService.getService().getAppointmentGru(appointment);
+        
+        return String.valueOf(appointmentGru.getCuid());
     }
 
     @Override
