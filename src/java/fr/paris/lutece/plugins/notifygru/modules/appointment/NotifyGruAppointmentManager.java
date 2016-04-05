@@ -60,6 +60,7 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -142,10 +143,10 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     {
         String strGUID = "";
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );        
-        AppointmentGru appointmentGru = AppointmentGruService.getService().getAppointmentGru(appointment);
-        
-        strGUID = appointmentGru.getGuid();
+        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
+        AppointmentGru appointmentGru = AppointmentGruService.getService(  ).getAppointmentGru( appointment );
+
+        strGUID = appointmentGru.getGuid(  );
 
         return strGUID;
     }
@@ -160,9 +161,9 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
         Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
 
-       AppointmentGru appointmentGru = AppointmentGruService.getService().getAppointmentGru(appointment);
+        AppointmentGru appointmentGru = AppointmentGruService.getService(  ).getAppointmentGru( appointment );
 
-        return appointmentGru.getMobilePhoneNumber();
+        return appointmentGru.getMobilePhoneNumber(  );
     }
 
     /* (non-Javadoc)
@@ -215,13 +216,14 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
             int nMinute = appointmentSlot.getStartingMinute(  );
             String strPrefixMinute = "";
-            if( nMinute < 10 )
+
+            if ( nMinute < 10 )
             {
-            	strPrefixMinute = "0";
+                strPrefixMinute = "0";
             }
-           
+
             model.put( MARK_TIME_APOINTMENT,
-                appointmentSlot.getStartingHour(  ) + "h:" +strPrefixMinute+nMinute + "mn" );
+                appointmentSlot.getStartingHour(  ) + "h:" + strPrefixMinute + nMinute + "mn" );
 
             model.put( MARK_REFERENCE, appointmentForm.getReference(  ) + '-' + appointment.getIdAppointment(  ) );
 
@@ -379,11 +381,11 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public String getCustomerId( int nIdResourceHistory )
     {
-          ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
         Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-        AppointmentGru appointmentGru = AppointmentGruService.getService().getAppointmentGru(appointment);
-        
-        return String.valueOf(appointmentGru.getCuid());
+        AppointmentGru appointmentGru = AppointmentGruService.getService(  ).getAppointmentGru( appointment );
+
+        return String.valueOf( appointmentGru.getCuid(  ) );
     }
 
     @Override
