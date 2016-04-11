@@ -248,7 +248,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             List<Response> listResponses = AppointmentHome.findListResponse( appointment.getIdAppointment(  ) );
 
             for ( Response response : listResponses )
-            {
+            { 
                 Entry entry = EntryHome.findByPrimaryKey( response.getEntry(  ).getIdEntry(  ) );
                 model.put( MARK_ENTRY_BASE + entry.getPosition(  ), response.getResponseValue(  ) );
             }
