@@ -429,6 +429,44 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
         }
     }
 
+    
+    @Override
+    public void updateListProvider(  )
+    {
+        List<AppointmentForm> listAppointmentForms = AppointmentFormHome.getAppointmentFormsList(  );
+
+        if ( _listProviderNotifyGruManager == null )
+        {
+            _listProviderNotifyGruManager = new HashMap<String, NotifyGruAppointmentManager>(  );
+        }
+
+        for ( AppointmentForm appointment : listAppointmentForms )
+        {
+            String strKeyProvider = _strKey + appointment.getIdForm(  );
+            String strBeanName = _strKey + appointment.getIdForm(  );
+
+           
+
+            if ( !_listProviderNotifyGruManager.containsKey( strKeyProvider )  )
+            {
+                NotifyGruAppointmentManager provider = new NotifyGruAppointmentManager(  );
+                provider._resourceHistoryService = _resourceHistoryService;
+                provider._actionDAO = _actionDAO;
+
+                provider.setBeanName( strBeanName );
+                provider.setKey( strKeyProvider );
+                provider.settitleI18nKey( TITLE_I18NKEY );
+                provider.setIdFormAppointment( appointment.getIdForm(  ) );
+
+                provider.setOrderPhoneNumber( AppPropertiesService.getPropertyInt( 
+                        PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER, 0 ) );
+
+                _listProviderNotifyGruManager.put( strKeyProvider, provider );
+            }
+
+            //
+        }
+    }
     @Override
     public ReferenceList buildReferenteListProvider(  )
     {
@@ -460,4 +498,27 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     {
         return _listProviderNotifyGruManager.get( strKey );
     }
+    
+    @Override
+	public ReferenceList getReferenteListEntityProvider()
+	{
+		// TODO Auto-generated method stub		
+		ReferenceList refenreceList = new ReferenceList(  );      
+		
+		  AppointmentForm formAppointment = AppointmentFormHome.findByPrimaryKey( _nidFormAppointment );
+          EntryFilter entryFilter = new EntryFilter(  );
+          entryFilter.setIdResource( formAppointment.getIdForm(  ) );
+          entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
+          entryFilter.setEntryParentNull( EntryFilter.FILTER_TRUE );
+          entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
+
+          List<Entry> listEntry = EntryHome.getEntryList( entryFilter );
+
+          for ( Entry entry : listEntry )
+          {
+        	  refenreceList.addItem( entry.getPosition(), entry.getTitle() );
+          }
+               
+          return refenreceList;
+	}
 }
