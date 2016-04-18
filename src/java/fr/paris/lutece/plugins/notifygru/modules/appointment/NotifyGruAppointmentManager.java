@@ -46,6 +46,8 @@ import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
+import fr.paris.lutece.plugins.modulenotifygrumappingmanager.business.NotifygruMappingManager;
+import fr.paris.lutece.plugins.modulenotifygrumappingmanager.business.NotifygruMappingManagerHome;
 import fr.paris.lutece.plugins.notifygru.modules.appointment.services.IDemandTypeService;
 import fr.paris.lutece.plugins.workflow.business.action.ActionDAO;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider;
@@ -57,7 +59,6 @@ import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
@@ -418,9 +419,14 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
                 provider.setKey( strKeyProvider );
                 provider.settitleI18nKey( TITLE_I18NKEY );
                 provider.setIdFormAppointment( appointment.getIdForm(  ) );
+                provider.setManagerProvider( true );
 
-                provider.setOrderPhoneNumber( AppPropertiesService.getPropertyInt( 
-                        PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER, 0 ) );
+                NotifygruMappingManager mapping = NotifygruMappingManagerHome.findByPrimaryKey( strBeanName );
+                if( mapping != null )
+                {                	  
+                       provider.setOrderPhoneNumber( mapping.getMobilePhoneNumber( ) );                       
+                }
+
 
                 _listProviderNotifyGruManager.put( strKeyProvider, provider );
             }
@@ -457,9 +463,16 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
                 provider.setKey( strKeyProvider );
                 provider.settitleI18nKey( TITLE_I18NKEY );
                 provider.setIdFormAppointment( appointment.getIdForm(  ) );
+                provider.setManagerProvider( true );
 
-                provider.setOrderPhoneNumber( AppPropertiesService.getPropertyInt( 
-                        PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER, 0 ) );
+//                provider.setOrderPhoneNumber( AppPropertiesService.getPropertyInt( 
+//                        PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER, 0 ) );
+                
+                NotifygruMappingManager mapping = NotifygruMappingManagerHome.findByPrimaryKey( strBeanName );
+                if( mapping != null )
+                {                	  
+                       provider.setOrderPhoneNumber( mapping.getMobilePhoneNumber( ) );                       
+                }
 
                 _listProviderNotifyGruManager.put( strKeyProvider, provider );
             }
