@@ -425,16 +425,13 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
      */
     @Override
     public int getOptionalDemandIdType( int nIdResourceHistory )
-    {
-       
+    {       
         if ( _beanDemandTypeService == null )
         {
             _beanDemandTypeService = SpringContextService.getBean( BEAN_SERVICE_DEMAND_TYPE );
         }
-
         int nDemandType = _beanDemandTypeService.getDemandType( getAppointmentForm( ) );
         AppLogService.info( "DemandTypeId : " + nDemandType );
-
         return nDemandType;
     }
 
@@ -586,9 +583,14 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
         for ( Map.Entry<String, NotifyGruAppointmentManager> entrySet : _listProviderNotifyGruManager.entrySet(  ) )
         {    
-            NotifyGruAppointmentManager provider = entrySet.getValue(  );           
+        	
+            NotifyGruAppointmentManager provider = entrySet.getValue(  );   
+            
+          //must be select. we have in the provider selection
+       	 AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( provider.getIdFormAppointment(  ) );
+       	 
             refenreceList.addItem( provider.getBeanName(  ),
-                provider.getTitle( Locale.getDefault(  ) ) + " : " + getAppointmentForm( ).getTitle(  ) );
+                provider.getTitle( Locale.getDefault(  ) ) + " : " +appointmentForm.getTitle(  ) );
         }
 
         return refenreceList;
@@ -618,7 +620,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
 	public ReferenceList getReferenteListEntityProvider()
 	{
-		// TODO Auto-generated method stub		
+		
 		ReferenceList refenreceList = new ReferenceList(  );
 	      EntryFilter entryFilter = new EntryFilter(  );
           entryFilter.setIdResource( getAppointmentForm( ).getIdForm(  ) );
