@@ -58,6 +58,7 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistorySer
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -70,14 +71,23 @@ import java.util.Map;
 import javax.inject.Inject;
 
 
+
 /**
  * The Class NotifyGruAppointment.
  */
 public class NotifyGruAppointmentManager extends AbstractServiceProvider
 {
+    
+    /** The _list provider notify gru manager. */
     private static Map<String, NotifyGruAppointmentManager> _listProviderNotifyGruManager;
+    
+    /** The _str key. */
     private static String _strKey = "notifygru-appointment.ProviderService.@.";
+    
+    /** The _bean demand type service. */
     private static IDemandTypeService _beanDemandTypeService;
+    
+    /** The Constant BEAN_SERVICE_DEMAND_TYPE. */
     private static final String BEAN_SERVICE_DEMAND_TYPE = "notifygru-appointment.DefaultDemandTypeService";
 
     /** The Constant MARK_LIST_RESPONSE. */
@@ -89,12 +99,26 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
     /** The Constant MARK_LASTNAME. */
     private static final String MARK_LASTNAME = "lastName";
+    
+    /** The Constant MARK_DATE_APOINTMENT. */
     private static final String MARK_DATE_APOINTMENT = "date_appointment";
+    
+    /** The Constant MARK_TIME_APOINTMENT. */
     private static final String MARK_TIME_APOINTMENT = "time_appointment";
+    
+    /** The Constant MARK_REFERENCE. */
     private static final String MARK_REFERENCE = "reference";
+    
+    /** The Constant MARK_RECAP. */
     private static final String MARK_RECAP = "recap";
+    
+    /** The Constant MARK_URL_CANCEL. */
     private static final String MARK_URL_CANCEL = "url_cancel";
+    
+    /** The Constant MARK_APPOINTMENT. */
     private static final String MARK_APPOINTMENT = "appointment";
+    
+    /** The Constant MARK_SLOT. */
     private static final String MARK_SLOT = "slot";
 
     /** The Constant MARK_EMAIL. */
@@ -102,17 +126,24 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
     /** The Constant MARK_ENTRY_BASE. */
     private static final String MARK_ENTRY_BASE = "reponse_";
+    
+    /** The Constant TITLE_I18NKEY. */
     private static final String TITLE_I18NKEY = "module.notifygru.appointment.module.providerappointment";
-    private static final String PROPERTY_CONFIG_PROVIDER_PHONE_NUMBER = "notifygru-appointment.config.provider.PositionDemandType";
+    
+
 
     /** The Constant TEMPLATE_INFOS_HELP. */
     private static final String TEMPLATE_INFOS_HELP = "admin/plugins/workflow/modules/notifygru/appointment/freemarker_list.html";
+    
+    /** The Constant TEMPLATE_INFOS_RECAP. */
     private static final String TEMPLATE_INFOS_RECAP = "admin/plugins/workflow/modules/notifygru/appointment/recap.html";
 
     /** The _resource history service. */
     // SERVICES
     @Inject
     private IResourceHistoryService _resourceHistoryService;
+    
+    /** The _action dao. */
     @Inject
     private ActionDAO _actionDAO;
 
@@ -120,20 +151,111 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     private int _nidFormAppointment;
 
     /** The _n order phone number. */
-    private int _nOrderPhoneNumber;
+    private int _nOrderMobilePhoneNumber;
+    
+    /** The _appointment gru. */
+    private AppointmentGru _appointmentGru;
+    
+    /** The _appointment. */
+    private Appointment _appointment;
+    
+    /** The _resource history. */
+    private ResourceHistory _resourceHistory;
+    
+    /** The _appointment form. */
+    private AppointmentForm _appointmentForm;
 
+    
+    
+    /**
+     * Gets the appointment.
+     *
+     * @param nIdResourceHistory the n id resource history
+     * @return the appointment
+     */
+    private Appointment getAppointment( int nIdResourceHistory )
+    {
+    	if( ( _appointment == null ) || (  _resourceHistory != null && nIdResourceHistory != _resourceHistory.getId( ) ) )
+        {
+    		_appointment =  AppointmentHome.findByPrimaryKey( getResourceHistory( nIdResourceHistory ).getIdResource(  ) );
+        }
+    	
+    	if( _appointment == null )
+    	{    	
+    		throw new AppException( "Appontment is NULL" );
+    	}
+    	return _appointment;
+    }
+    
+    
+    //  AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment(  ) );
+    
+    /**
+     * Gets the appointment form.
+     *
+     * @return the appointment form
+     */
+    private AppointmentForm getAppointmentForm(  )
+    {
+    	if( _appointmentForm == null )
+    	{
+    		_appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment(  ) );
+    	}
+    	
+    	if( _appointmentForm == null )
+    	{    	
+    		throw new AppException( "_appointmentForm is NULL" );
+    	}
+    	
+    	return _appointmentForm;
+    }
+    /**
+     * Gets the appointment gru.
+     *
+     * @param nIdResourceHistory the n id resource history
+     * @return the appointment gru
+     */
+    private AppointmentGru getAppointmentGru( int nIdResourceHistory )
+    {
+    	if( ( _appointmentGru == null ) || (  _resourceHistory != null && nIdResourceHistory != _resourceHistory.getId( ) ) )
+        {
+    		_appointmentGru =  AppointmentGruService.getService(  ).getAppointmentGru( getAppointment( nIdResourceHistory ), getBeanName() );
+        }
+    	
+    	if( _appointmentGru == null )
+    	{    	
+    		throw new AppException( "AppontmentGRU is NULL" );
+    	}
+    	return _appointmentGru;
+    }
+    
+    /**
+     * Gets the resource history.
+     *
+     * @param nIdResourceHistory the n id resource history
+     * @return the resource history
+     */
+    private ResourceHistory getResourceHistory( int nIdResourceHistory )
+    {
+    	if( ( _resourceHistory == null ) || (  _resourceHistory != null && nIdResourceHistory != _resourceHistory.getId( ) ) )
+        {
+        	_resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
+        }
+    	
+    	if( _resourceHistory == null )
+    	{    	
+    		throw new AppException( "Ressource History is NULL" );
+    	}
+    	return _resourceHistory;
+    }
+    
     /* (non-Javadoc)
      * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getUserEmail(int)
      */
     @Override
     public String getUserEmail( int nIdResourceHistory )
-    {
-        String strEmail = null;
-        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-        strEmail = appointment.getEmail(  );
-
-        return strEmail;
+    { 
+        return  getAppointment( nIdResourceHistory ).getEmail(  );
     }
 
     /* (non-Javadoc)
@@ -141,15 +263,8 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
      */
     @Override
     public String getUserGuid( int nIdResourceHistory )
-    {
-        String strGUID = "";
-        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-        AppointmentGru appointmentGru = AppointmentGruService.getService(  ).getAppointmentGru( appointment );
-
-        strGUID = appointmentGru.getGuid(  );
-
-        return strGUID;
+    {      
+        return getAppointmentGru( nIdResourceHistory ).getGuid();
     }
 
     /* (non-Javadoc)
@@ -158,13 +273,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public String getOptionalMobilePhoneNumber( int nIdResourceHistory )
     {
-        String strPhoneNumber = null;
-        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-
-        AppointmentGru appointmentGru = AppointmentGruService.getService(  ).getAppointmentGru( appointment );
-
-        return appointmentGru.getMobilePhoneNumber(  );
+    	  return getAppointmentGru( nIdResourceHistory ).getMobilePhoneNumber( );
     }
 
     /* (non-Javadoc)
@@ -174,10 +283,9 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     public String getInfosHelp( Locale local )
     {
         Map<String, Object> model = new HashMap<String, Object>(  );
-        AppointmentForm formAppointment = AppointmentFormHome.findByPrimaryKey( _nidFormAppointment );
-
+     
         EntryFilter entryFilter = new EntryFilter(  );
-        entryFilter.setIdResource( formAppointment.getIdForm(  ) );
+        entryFilter.setIdResource( getAppointmentForm( ).getIdForm(  ) );
         entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
         entryFilter.setEntryParentNull( EntryFilter.FILTER_TRUE );
         entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
@@ -186,7 +294,8 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
         model.put( MARK_LIST_RESPONSE, listEntry );
 
-        HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
+        @SuppressWarnings( "deprecation" )
+		HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                     TEMPLATE_INFOS_HELP, local, model ).getHtml(  ), local, model );
 
         String strResourceInfo = t.getHtml(  );
@@ -204,16 +313,13 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
 
         if ( nIdResourceHistory > 0 )
         {
-            ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-            Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-            AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment(  ) );
+          
+            AppointmentSlot appointmentSlot = AppointmentSlotHome.findByPrimaryKey( getAppointment( nIdResourceHistory ).getIdSlot(  ) );
 
-            AppointmentSlot appointmentSlot = AppointmentSlotHome.findByPrimaryKey( appointment.getIdSlot(  ) );
-
-            model.put( MARK_FIRSTNAME, appointment.getFirstName(  ) );
-            model.put( MARK_LASTNAME, appointment.getLastName(  ) );
-            model.put( MARK_EMAIL, appointment.getEmail(  ) );
-            model.put( MARK_DATE_APOINTMENT, appointment.getDateAppointment(  ) );
+            model.put( MARK_FIRSTNAME, getAppointment( nIdResourceHistory ).getFirstName(  ) );
+            model.put( MARK_LASTNAME, getAppointment( nIdResourceHistory ).getLastName(  ) );
+            model.put( MARK_EMAIL, getAppointment( nIdResourceHistory ).getEmail(  ) );
+            model.put( MARK_DATE_APOINTMENT, getAppointment( nIdResourceHistory ).getDateAppointment(  ) );
 
             int nMinute = appointmentSlot.getStartingMinute(  );
             String strPrefixMinute = "";
@@ -226,18 +332,19 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             model.put( MARK_TIME_APOINTMENT,
                 appointmentSlot.getStartingHour(  ) + "h:" + strPrefixMinute + nMinute + "mn" );
 
-            model.put( MARK_REFERENCE, appointmentForm.getReference(  ) + '-' + appointment.getIdAppointment(  ) );
+            model.put( MARK_REFERENCE, getAppointmentForm( ).getReference(  ) + '-' + getAppointment( nIdResourceHistory ).getIdAppointment(  ) );
 
             String strUrlCancel = "/";
-            strUrlCancel = AppointmentApp.getCancelAppointmentUrl( appointment );
+            strUrlCancel = AppointmentApp.getCancelAppointmentUrl( getAppointment( nIdResourceHistory ) );
 
             model.put( MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) );
 
             Map<String, Object> modelRecap = new HashMap<String, Object>(  );
-            modelRecap.put( MARK_APPOINTMENT, appointment );
+            modelRecap.put( MARK_APPOINTMENT, getAppointment( nIdResourceHistory ) );
             modelRecap.put( MARK_SLOT, appointmentSlot );
 
-            HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
+            @SuppressWarnings( "deprecation" )
+			HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                         TEMPLATE_INFOS_RECAP, Locale.getDefault(  ), modelRecap ).getHtml(  ), Locale.getDefault(  ),
                     modelRecap );
 
@@ -246,7 +353,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             model.put( MARK_RECAP, strRecap );
 
             //  appointment.
-            List<Response> listResponses = AppointmentHome.findListResponse( appointment.getIdAppointment(  ) );
+            List<Response> listResponses = AppointmentHome.findListResponse( getAppointment( nIdResourceHistory ).getIdAppointment(  ) );
 
             for ( Response response : listResponses )
             { 
@@ -266,9 +373,9 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             model.put( MARK_URL_CANCEL, "" );
             model.put( MARK_RECAP, "" );
 
-            AppointmentForm formAppointment = AppointmentFormHome.findByPrimaryKey( _nidFormAppointment );
+  
             EntryFilter entryFilter = new EntryFilter(  );
-            entryFilter.setIdResource( formAppointment.getIdForm(  ) );
+            entryFilter.setIdResource( getAppointmentForm( ).getIdForm(  ) );
             entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
             entryFilter.setEntryParentNull( EntryFilter.FILTER_TRUE );
             entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
@@ -310,10 +417,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public int getOptionalDemandId( int nIdResourceHistory )
     {
-        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-
-        return appointment.getIdAppointment(  );
+         return getAppointment( nIdResourceHistory ).getIdAppointment( );
     }
 
     /* (non-Javadoc)
@@ -322,41 +426,28 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public int getOptionalDemandIdType( int nIdResourceHistory )
     {
-        AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment(  ) );
-
+       
         if ( _beanDemandTypeService == null )
         {
             _beanDemandTypeService = SpringContextService.getBean( BEAN_SERVICE_DEMAND_TYPE );
         }
 
-        int nDemandType = _beanDemandTypeService.getDemandType( appointmentForm );
+        int nDemandType = _beanDemandTypeService.getDemandType( getAppointmentForm( ) );
         AppLogService.info( "DemandTypeId : " + nDemandType );
 
         return nDemandType;
     }
 
-    /**
-     * Gets the appointment.
-     *
-     * @param nIdResourceHistory the n id resource history
-     * @return the appointment
-     */
-    public Appointment getAppointment( int nIdResourceHistory )
-    {
-        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
 
-        return appointment;
-    }
 
     /**
      * Gets the order phone number.
      *
      * @return the order phone number
      */
-    public int getOrderPhoneNumber(  )
+    public int getOrderMobilePhoneNumber(  )
     {
-        return _nOrderPhoneNumber;
+        return _nOrderMobilePhoneNumber;
     }
 
     /**
@@ -364,31 +455,32 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
      *
      * @param nOrderPhoneNumber the new order phone number
      */
-    public void setOrderPhoneNumber( int nOrderPhoneNumber )
+    public void setOrderMobilePhoneNumber( int nOrderPhoneNumber )
     {
-        _nOrderPhoneNumber = nOrderPhoneNumber;
+        _nOrderMobilePhoneNumber = nOrderPhoneNumber;
     }
 
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getDemandReference(int)
+     */
     @Override
     public String getDemandReference( int nIdResourceHistory )
     {
-        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-        AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( getIdFormAppointment(  ) );
-
-        return appointmentForm.getReference(  ) + '-' + appointment.getIdAppointment(  );
+        return getAppointmentForm( ).getReference(  ) + '-' + getAppointment( nIdResourceHistory ).getIdAppointment(  );
     }
 
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.IProvider#getCustomerId(int)
+     */
     @Override
     public String getCustomerId( int nIdResourceHistory )
-    {
-        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        Appointment appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource(  ) );
-        AppointmentGru appointmentGru = AppointmentGruService.getService(  ).getAppointmentGru( appointment );
-
-        return String.valueOf( appointmentGru.getCuid(  ) );
+    {     
+        return String.valueOf( getAppointmentGru( nIdResourceHistory ).getCuid(  ) );
     }
 
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider#updateListProvider(fr.paris.lutece.plugins.workflowcore.service.task.ITask)
+     */
     @Override
     public void updateListProvider( ITask task )
     {
@@ -399,17 +491,17 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             _listProviderNotifyGruManager = new HashMap<String, NotifyGruAppointmentManager>(  );
         }
 
-        for ( AppointmentForm appointment : listAppointmentForms )
+        for ( AppointmentForm appointmentForm : listAppointmentForms )
         {
-            String strKeyProvider = _strKey + appointment.getIdForm(  );
-            String strBeanName = _strKey + appointment.getIdForm(  );
+            String strKeyProvider = _strKey + appointmentForm.getIdForm(  );
+            String strBeanName = _strKey + appointmentForm.getIdForm(  );
 
             Action action = _actionDAO.load( task.getAction(  ).getId(  ) );
 
             Workflow wf = action.getWorkflow(  );
 
-            if ( !_listProviderNotifyGruManager.containsKey( strKeyProvider ) && appointment.getIsActive(  ) &&
-                    ( wf.getId(  ) == appointment.getIdWorkflow(  ) ) )
+            if ( !_listProviderNotifyGruManager.containsKey( strKeyProvider ) && appointmentForm.getIsActive(  ) &&
+                    ( wf.getId(  ) == appointmentForm.getIdWorkflow(  ) ) )
             {
                 NotifyGruAppointmentManager provider = new NotifyGruAppointmentManager(  );
                 provider._resourceHistoryService = _resourceHistoryService;
@@ -418,13 +510,13 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
                 provider.setBeanName( strBeanName );
                 provider.setKey( strKeyProvider );
                 provider.settitleI18nKey( TITLE_I18NKEY );
-                provider.setIdFormAppointment( appointment.getIdForm(  ) );
+                provider.setIdFormAppointment( appointmentForm.getIdForm(  ) );
                 provider.setManagerProvider( true );
 
                 NotifygruMappingManager mapping = NotifygruMappingManagerHome.findByPrimaryKey( strBeanName );
                 if( mapping != null )
                 {                	  
-                       provider.setOrderPhoneNumber( mapping.getMobilePhoneNumber( ) );                       
+                       provider.setOrderMobilePhoneNumber( mapping.getMobilePhoneNumber( ) );                       
                 }
 
 
@@ -436,6 +528,9 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     }
 
     
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider#updateListProvider()
+     */
     @Override
     public void updateListProvider(  )
     {
@@ -471,7 +566,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
                 NotifygruMappingManager mapping = NotifygruMappingManagerHome.findByPrimaryKey( strBeanName );
                 if( mapping != null )
                 {                	  
-                       provider.setOrderPhoneNumber( mapping.getMobilePhoneNumber( ) );                       
+                       provider.setOrderMobilePhoneNumber( mapping.getMobilePhoneNumber( ) );                       
                 }
 
                 _listProviderNotifyGruManager.put( strKeyProvider, provider );
@@ -480,47 +575,53 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
             //
         }
     }
+    
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider#buildReferenteListProvider()
+     */
     @Override
     public ReferenceList buildReferenteListProvider(  )
     {
         ReferenceList refenreceList = new ReferenceList(  );
 
         for ( Map.Entry<String, NotifyGruAppointmentManager> entrySet : _listProviderNotifyGruManager.entrySet(  ) )
-        {
-            String key = entrySet.getKey(  );
-            NotifyGruAppointmentManager provider = entrySet.getValue(  );
-
-            // AppointmentForm directory = AppointmentFormHome.findByPrimaryKey(provider.getIdDirectory(), _pluginDirectory);
-            AppointmentForm appointment = AppointmentFormHome.findByPrimaryKey( provider.getIdFormAppointment(  ) );
-
+        {    
+            NotifyGruAppointmentManager provider = entrySet.getValue(  );           
             refenreceList.addItem( provider.getBeanName(  ),
-                provider.getTitle( Locale.getDefault(  ) ) + " : " + appointment.getTitle(  ) );
+                provider.getTitle( Locale.getDefault(  ) ) + " : " + getAppointmentForm( ).getTitle(  ) );
         }
 
         return refenreceList;
     }
 
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider#isKeyProvider(java.lang.String)
+     */
     @Override
     public Boolean isKeyProvider( String strKey )
     {
         return ( _listProviderNotifyGruManager == null ) ? false : _listProviderNotifyGruManager.containsKey( strKey );
     }
 
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider#getInstanceProvider(java.lang.String)
+     */
     @Override
     public AbstractServiceProvider getInstanceProvider( String strKey )
     {
         return _listProviderNotifyGruManager.get( strKey );
     }
     
+    /* (non-Javadoc)
+     * @see fr.paris.lutece.plugins.workflow.modules.notifygru.service.AbstractServiceProvider#getReferenteListEntityProvider()
+     */
     @Override
 	public ReferenceList getReferenteListEntityProvider()
 	{
 		// TODO Auto-generated method stub		
-		ReferenceList refenreceList = new ReferenceList(  );      
-		
-		  AppointmentForm formAppointment = AppointmentFormHome.findByPrimaryKey( _nidFormAppointment );
-          EntryFilter entryFilter = new EntryFilter(  );
-          entryFilter.setIdResource( formAppointment.getIdForm(  ) );
+		ReferenceList refenreceList = new ReferenceList(  );
+	      EntryFilter entryFilter = new EntryFilter(  );
+          entryFilter.setIdResource( getAppointmentForm( ).getIdForm(  ) );
           entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
           entryFilter.setEntryParentNull( EntryFilter.FILTER_TRUE );
           entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
