@@ -70,6 +70,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  * The Class NotifyGruAppointment.
@@ -476,7 +478,8 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public String getCustomerId( int nIdResourceHistory )
     {
-        return  getAppointmentGru( nIdResourceHistory ).getCuid(  ) ;
+    	String cuid = getAppointmentGru( nIdResourceHistory ).getCuid(  );
+        return  cuid != null ?cuid : StringUtils.EMPTY ;
     }
 
     /* (non-Javadoc)
