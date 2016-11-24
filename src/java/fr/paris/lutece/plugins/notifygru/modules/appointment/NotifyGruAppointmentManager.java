@@ -476,7 +476,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public String getCustomerId( int nIdResourceHistory )
     {
-        return String.valueOf( getAppointmentGru( nIdResourceHistory ).getCuid(  ) );
+        return  getAppointmentGru( nIdResourceHistory ).getCuid(  ) ;
     }
 
     /* (non-Javadoc)
