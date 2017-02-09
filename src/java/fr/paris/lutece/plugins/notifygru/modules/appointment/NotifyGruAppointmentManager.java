@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.appointment.business.AppointmentFormHome;
 import fr.paris.lutece.plugins.appointment.business.AppointmentHome;
 import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlot;
 import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlotHome;
+import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.web.AppointmentApp;
 import fr.paris.lutece.plugins.appointmentgru.business.AppointmentGru;
 import fr.paris.lutece.plugins.appointmentgru.services.AppointmentGruService;
@@ -468,8 +469,10 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     @Override
     public String getDemandReference( int nIdResourceHistory )
     {
-        return getAppointmentForm(  ).getReference(  ) + '-' +
-        getAppointment( nIdResourceHistory ).getIdAppointment(  );
+        
+    	Appointment appt= getAppointment( nIdResourceHistory );
+    	
+    	return AppointmentService.getService().computeRefAppointment(appt);
     }
 
     /* (non-Javadoc)
