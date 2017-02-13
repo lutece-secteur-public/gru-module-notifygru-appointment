@@ -80,7 +80,7 @@ import org.apache.commons.lang.StringUtils;
 public class NotifyGruAppointmentManager extends AbstractServiceProvider
 {
     /** The _list provider notify gru manager. */
-    private static Map<String, NotifyGruAppointmentManager> _listProviderNotifyGruManager;
+    private  Map<String, NotifyGruAppointmentManager> _listProviderNotifyGruManager;
 
     /** The _str key. */
     private static String _strKey = "notifygru-appointment.ProviderService.@.";
