@@ -72,6 +72,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.util.Strings;
 
 
 /**
@@ -337,8 +338,7 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
                 appointmentSlot.getStartingHour(  ) + "h:" + strPrefixMinute + nMinute + "mn" );
 
             model.put( MARK_REFERENCE,
-                getAppointmentForm(  ).getReference(  ) + '-' +
-                getAppointment( nIdResourceHistory ).getIdAppointment(  ) );
+            		getDemandReference(nIdResourceHistory) );
 
             String strUrlCancel = "/";
             strUrlCancel = AppointmentApp.getCancelAppointmentUrl( getAppointment( nIdResourceHistory ) );
@@ -471,8 +471,10 @@ public class NotifyGruAppointmentManager extends AbstractServiceProvider
     {
         
     	Appointment appt= getAppointment( nIdResourceHistory );
-    	
-    	return AppointmentService.getService().computeRefAppointment(appt);
+    	String strReference = StringUtils.isEmpty( getAppointmentForm(  ).getReference(  ) ) ? "" : ( Strings.toUpperCase( getAppointmentForm(  ).getReference(  ).trim( ) ) + " - " );
+        strReference += AppointmentService.getService( ).computeRefAppointment( appt );
+        	
+    	return strReference;
     }
 
     /* (non-Javadoc)
