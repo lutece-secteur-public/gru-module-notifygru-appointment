@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2015, Mairie de Paris
+ * Copyright (c) 2002-2016, Mairie de Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.notifygru.modules.appointment.services;
 
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 
-
 // TODO: Auto-generated Javadoc
 /**
  * The Interface IDemandTypeService.
@@ -45,7 +44,8 @@ public interface IDemandTypeService
     /**
      * Gets the demand type.
      *
-     * @param appointmentForm the appointment form
+     * @param appointmentForm
+     *            the appointment form
      * @return the demand type
      */
     int getDemandType( AppointmentForm appointmentForm );

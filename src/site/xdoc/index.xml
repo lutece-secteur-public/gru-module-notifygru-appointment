@@ -23,14 +23,11 @@
                  to indicate that we have a manager provider instance of this service</p>
              
               <p>In the context file, we like reporting BEAN :
-           <code>     <bean id="notifygru-appointment.ProviderService"  
-    	class="fr.paris.lutece.plugins.notifygru.modules.appointment.NotifyGruAppointmentManager" 
-    	p:key="notifygru-appointment.ProviderService"
- 		p:titleI18nKey="module.notifygru.appointment.module.providerappointment"
-        p:beanName="notifygru-appointment.ProviderService"    
-         p:managerProvider="true" 
-    />  
-    </code>            
+           <code>
+            <bean id="notifygru-appointment.ProviderService" class="fr.paris.lutece.plugins.notifygru.modules.appointment.provider.AppointmentProviderManager">
+                <constructor-arg type="java.lang.String" value="notifygru-appointment.ProviderService"/>
+            </bean>  
+           </code>            
             </p>
             
             </subsection>

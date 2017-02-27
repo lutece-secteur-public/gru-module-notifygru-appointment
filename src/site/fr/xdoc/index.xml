@@ -22,14 +22,11 @@
                  pour indiquer que nous avons un gestionnaire de ce service</p>
              
              <p>Dans le fichier context, nous aurons comme déclaration de BEAN :
-           <code>     <bean id="notifygru-appointment.ProviderService"  
-    	class="fr.paris.lutece.plugins.notifygru.modules.appointment.NotifyGruAppointmentManager" 
-    	p:key="notifygru-appointment.ProviderService"
- 		p:titleI18nKey="module.notifygru.appointment.module.providerappointment"
-        p:beanName="notifygru-appointment.ProviderService"    
-         p:managerProvider="true" 
-    />  
-    </code>            
+           <code>
+            <bean id="notifygru-appointment.ProviderService" class="fr.paris.lutece.plugins.notifygru.modules.appointment.provider.AppointmentProviderManager">
+                <constructor-arg type="java.lang.String" value="notifygru-appointment.ProviderService"/>
+            </bean>  
+           </code>            
             </p>
             
             </subsection>

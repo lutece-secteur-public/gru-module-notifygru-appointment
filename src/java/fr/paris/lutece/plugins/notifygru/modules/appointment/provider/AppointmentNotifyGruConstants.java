@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2016, Mairie de Paris
+ * Copyright (c) 2002-2017, Mairie de Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,29 +31,30 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.notifygru.modules.appointment;
-
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
-import fr.paris.lutece.portal.service.plugin.PluginService;
+package fr.paris.lutece.plugins.notifygru.modules.appointment.provider;
 
 /**
  *
- * ProviderTicketingPlugin
- *
  */
-public class NotifyGruAppointmentPlugin extends PluginDefaultImplementation
+public final class AppointmentNotifyGruConstants
 {
-    public static final String PLUGIN_NAME = "notifygru-appointment";
-    public static final String BEAN_TRANSACTION_MANAGER = PLUGIN_NAME + ".transactionManager";
+    // MARK
+    public static final String MARK_FIRSTNAME = "firstName";
+    public static final String MARK_LASTNAME = "lastName";
+    public static final String MARK_EMAIL = "email";
+    public static final String MARK_DATE_APOINTMENT = "date_appointment";
+    public static final String MARK_TIME_APOINTMENT = "time_appointment";
+    public static final String MARK_REFERENCE = "reference";
+    public static final String MARK_URL_CANCEL = "url_cancel";
+    public static final String MARK_RECAP = "recap";
+    public static final String MARK_ENTRY_BASE = "reponse_";
 
     /**
-     * Get the plugin
-     * 
-     * @return the plugin
+     * private constructor for constants class
      */
-    public static Plugin getPlugin( )
+    private AppointmentNotifyGruConstants( )
     {
-        return PluginService.getPlugin( PLUGIN_NAME );
+        super( );
     }
+
 }
