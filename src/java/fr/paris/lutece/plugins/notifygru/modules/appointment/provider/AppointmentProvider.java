@@ -57,12 +57,10 @@ import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
-import fr.paris.lutece.plugins.notifygru.modules.appointment.services.IDemandTypeService;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.service.provider.IProvider;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.service.provider.NotifyGruMarker;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.i18n.I18nService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -86,11 +84,6 @@ public class AppointmentProvider implements IProvider
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
     private static final String INFOS_RECAP_MARK_SLOT = "slot";
     private static final String TEMPLATE_INFOS_RECAP = "admin/plugins/workflow/modules/notifygru/appointment/recap.html";
-
-    // BEAN
-    /** The _bean demand type service. */
-    private static final String BEAN_SERVICE_DEMAND_TYPE = "notifygru-appointment.DefaultDemandTypeService";
-    private static IDemandTypeService _beanDemandTypeService = SpringContextService.getBean( BEAN_SERVICE_DEMAND_TYPE );
 
     // NEEDED OBJECTS
     /** The _appointment. */
@@ -145,7 +138,7 @@ public class AppointmentProvider implements IProvider
     @Override
     public String provideDemandTypeId( )
     {
-        return String.valueOf( _beanDemandTypeService.getDemandType( _appointmentForm ) );
+        return String.valueOf( _appointmentGru.getDemandeTypeId( ) );
     }
 
     /**

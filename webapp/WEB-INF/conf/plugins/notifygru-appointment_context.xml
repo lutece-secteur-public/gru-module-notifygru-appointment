@@ -15,6 +15,4 @@
     <bean id="notifygru-appointment.ProviderService" class="fr.paris.lutece.plugins.notifygru.modules.appointment.provider.AppointmentProviderManager">
         <constructor-arg type="java.lang.String" value="notifygru-appointment.ProviderService"/>
     </bean>
-    
-    <bean id="notifygru-appointment.DefaultDemandTypeService" class="fr.paris.lutece.plugins.notifygru.modules.appointment.services.DefaultDemandTypeService" />
 </beans>
