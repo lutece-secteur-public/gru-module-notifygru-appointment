@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 import fr.paris.lutece.plugins.appointment.business.AppointmentFormHome;
@@ -136,7 +137,7 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
      * {@inheritDoc}
      */
     @Override
-    public IProvider createProvider( String strProviderId, ResourceHistory resourceHistory )
+    public IProvider createProvider( String strProviderId, ResourceHistory resourceHistory, HttpServletRequest request )
     {
         return new AppointmentProvider( ProviderManagerUtil.buildCompleteProviderId( getId( ), strProviderId ), strProviderId, resourceHistory );
     }
