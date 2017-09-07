@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-notifygru-appointment</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.1</version>
     <name>Lutece notifygru appointment module</name>
 
     <repositories>
@@ -64,6 +64,6 @@
         <connection>scm:git:https://github.com/lutece-secteur-public/gru-module-notifygru-appointment.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-module-notifygru-appointment.git</developerConnection>
         <url>https://github.com/lutece-secteur-public/gru-module-notifygru-appointment.git</url>
-      <tag>HEAD</tag>
+      <tag>gru-module-notifygru-appointment-1.1.1</tag>
   </scm>
 </project>
