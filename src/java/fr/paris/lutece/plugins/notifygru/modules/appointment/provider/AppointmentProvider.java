@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.notifygru.modules.appointment.provider;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
 /**
@@ -84,6 +86,8 @@ public class AppointmentProvider implements IProvider
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
     private static final String INFOS_RECAP_MARK_SLOT = "slot";
     private static final String TEMPLATE_INFOS_RECAP = "admin/plugins/workflow/modules/notifygru/appointment/recap.html";
+    //PROPERTIES
+    private static final String PROPERTIE_DATE_FORMAT=AppPropertiesService.getProperty( "notifygru.appointment.dateformat","dd-MM-yyyy" );
 
     // NEEDED OBJECTS
     /** The _appointment. */
@@ -204,8 +208,10 @@ public class AppointmentProvider implements IProvider
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_EMAIL, _appointment.getEmail( ) ) );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );
         // FIXME date envoyee avec un toString, ne faudrait-il pas un DateFormat en properties ?
+        
+        SimpleDateFormat formater = new SimpleDateFormat( PROPERTIE_DATE_FORMAT );
         collectionNotifyGruMarkers
-                .add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, _appointment.getDateAppointment( ).toString( ) ) );
+                .add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formater.format(_appointment.getDateAppointment( ) ) ) );
 
         AppointmentSlot appointmentSlot = AppointmentSlotHome.findByPrimaryKey( _appointment.getIdSlot( ) );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT,
