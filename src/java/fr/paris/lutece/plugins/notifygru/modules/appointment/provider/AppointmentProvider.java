@@ -206,9 +206,7 @@ public class AppointmentProvider implements IProvider
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_FIRSTNAME, _appointment.getFirstName( ) ) );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_LASTNAME, _appointment.getLastName( ) ) );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_EMAIL, _appointment.getEmail( ) ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );
-        // FIXME date envoyee avec un toString, ne faudrait-il pas un DateFormat en properties ?
-        
+        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );        
         SimpleDateFormat formater = new SimpleDateFormat( PROPERTIE_DATE_FORMAT );
         collectionNotifyGruMarkers
                 .add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formater.format(_appointment.getDateAppointment( ) ) ) );
