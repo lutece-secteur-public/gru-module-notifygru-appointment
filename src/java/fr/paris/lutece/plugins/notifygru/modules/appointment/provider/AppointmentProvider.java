@@ -72,6 +72,9 @@ import fr.paris.lutece.util.html.HtmlTemplate;
  */
 public class AppointmentProvider implements IProvider
 {
+	// PROPERTY KEY
+	private static final String PROPERTY_SMS_SENDER_NAME = "workflow-notifygruappointment.gruprovider.sms.sendername";
+	
     // INFO MESSAGE KEY
     private static final String MESSAGE_MARKER_FIRSTNAME = "module.notifygru.appointment.task_notify_appointment_config.label_firstname";
     private static final String MESSAGE_MARKER_LASTNAME = "module.notifygru.appointment.task_notify_appointment_config.label_lastname";
@@ -146,6 +149,15 @@ public class AppointmentProvider implements IProvider
     }
 
     /**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String provideDemandSubtypeId()
+	{
+		return null;
+	}
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -185,7 +197,16 @@ public class AppointmentProvider implements IProvider
         return _appointment.getEmail( );
     }
 
-    /**
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String provideSmsSender()
+	{
+		return AppPropertiesService.getProperty( PROPERTY_SMS_SENDER_NAME );
+	}
+
+	/**
      * {@inheritDoc}
      */
     @Override
