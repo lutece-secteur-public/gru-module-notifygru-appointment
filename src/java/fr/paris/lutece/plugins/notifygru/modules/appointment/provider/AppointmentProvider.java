@@ -44,13 +44,13 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.Strings;
 
-import fr.paris.lutece.plugins.appointment.business.Appointment;
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
-import fr.paris.lutece.plugins.appointment.business.AppointmentFormHome;
-import fr.paris.lutece.plugins.appointment.business.AppointmentHome;
-import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlot;
-import fr.paris.lutece.plugins.appointment.business.calendar.AppointmentSlotHome;
+import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
+import fr.paris.lutece.plugins.appointment.business.slot.Slot;
+import fr.paris.lutece.plugins.appointment.service.AppointmentResponseService;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
+import fr.paris.lutece.plugins.appointment.service.FormService;
+import fr.paris.lutece.plugins.appointment.service.SlotService;
 import fr.paris.lutece.plugins.appointment.web.AppointmentApp;
 import fr.paris.lutece.plugins.appointmentgru.business.AppointmentGru;
 import fr.paris.lutece.plugins.appointmentgru.services.AppointmentGruService;
@@ -72,9 +72,9 @@ import fr.paris.lutece.util.html.HtmlTemplate;
  */
 public class AppointmentProvider implements IProvider
 {
-	// PROPERTY KEY
-	private static final String PROPERTY_SMS_SENDER_NAME = "workflow-notifygruappointment.gruprovider.sms.sendername";
-	
+    // PROPERTY KEY
+    private static final String PROPERTY_SMS_SENDER_NAME = "workflow-notifygruappointment.gruprovider.sms.sendername";
+
     // INFO MESSAGE KEY
     private static final String MESSAGE_MARKER_FIRSTNAME = "module.notifygru.appointment.task_notify_appointment_config.label_firstname";
     private static final String MESSAGE_MARKER_LASTNAME = "module.notifygru.appointment.task_notify_appointment_config.label_lastname";
@@ -89,8 +89,8 @@ public class AppointmentProvider implements IProvider
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
     private static final String INFOS_RECAP_MARK_SLOT = "slot";
     private static final String TEMPLATE_INFOS_RECAP = "admin/plugins/workflow/modules/notifygru/appointment/recap.html";
-    //PROPERTIES
-    private static final String PROPERTIE_DATE_FORMAT=AppPropertiesService.getProperty( "notifygru.appointment.dateformat","dd-MM-yyyy" );
+    // PROPERTIES
+    private static final String PROPERTIE_DATE_FORMAT = AppPropertiesService.getProperty( "notifygru.appointment.dateformat", "dd-MM-yyyy" );
 
     // NEEDED OBJECTS
     /** The _appointment. */
@@ -113,12 +113,12 @@ public class AppointmentProvider implements IProvider
     public AppointmentProvider( String beanProviderName, String strAppointmentFormId, ResourceHistory resourceHistory )
     {
         super( );
-        _appointment = AppointmentHome.findByPrimaryKey( resourceHistory.getIdResource( ) );
+        _appointment = AppointmentService.findAppointmentById( resourceHistory.getIdResource( ) );
         if ( _appointment == null )
         {
             throw new AppException( "No appointment for resource history Id : " + resourceHistory.getIdResource( ) );
         }
-        _appointmentForm = AppointmentFormHome.findByPrimaryKey( Integer.parseInt( strAppointmentFormId ) );
+        _appointmentForm = FormService.buildAppointmentForm( Integer.parseInt( strAppointmentFormId ), 0, 0 );
         if ( _appointmentForm == null )
         {
             throw new AppException( "No appointmentForm for  Id : " + strAppointmentFormId );
@@ -149,13 +149,13 @@ public class AppointmentProvider implements IProvider
     }
 
     /**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String provideDemandSubtypeId()
-	{
-		return null;
-	}
+     * {@inheritDoc}
+     */
+    @Override
+    public String provideDemandSubtypeId( )
+    {
+        return null;
+    }
 
     /**
      * {@inheritDoc}
@@ -165,7 +165,7 @@ public class AppointmentProvider implements IProvider
     {
         String strReference = StringUtils.isEmpty( _appointmentForm.getReference( ) ) ? ""
                 : ( Strings.toUpperCase( _appointmentForm.getReference( ).trim( ) ) + " - " );
-        strReference += AppointmentService.getService( ).computeRefAppointment( _appointment );
+        strReference += _appointment.getReference( );
 
         return strReference;
     }
@@ -197,16 +197,16 @@ public class AppointmentProvider implements IProvider
         return _appointment.getEmail( );
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String provideSmsSender()
-	{
-		return AppPropertiesService.getProperty( PROPERTY_SMS_SENDER_NAME );
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String provideSmsSender( )
+    {
+        return AppPropertiesService.getProperty( PROPERTY_SMS_SENDER_NAME );
+    }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -227,28 +227,23 @@ public class AppointmentProvider implements IProvider
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_FIRSTNAME, _appointment.getFirstName( ) ) );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_LASTNAME, _appointment.getLastName( ) ) );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_EMAIL, _appointment.getEmail( ) ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );        
+        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );
         SimpleDateFormat formater = new SimpleDateFormat( PROPERTIE_DATE_FORMAT );
-        collectionNotifyGruMarkers
-                .add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formater.format(_appointment.getDateAppointment( ) ) ) );
-
-        AppointmentSlot appointmentSlot = AppointmentSlotHome.findByPrimaryKey( _appointment.getIdSlot( ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT,
-                String.format( "%1$dh:%2$02dmn", appointmentSlot.getStartingHour( ), appointmentSlot.getStartingMinute( ) ) ) );
-
+        Slot slot = SlotService.findSlotById( _appointment.getIdSlot( ) );
+        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formater.format( slot.getDate( ) ) ) );
+        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, slot.getStartingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
-
         Map<String, Object> modelRecap = new HashMap<String, Object>( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
-        modelRecap.put( INFOS_RECAP_MARK_SLOT, appointmentSlot );
+        modelRecap.put( INFOS_RECAP_MARK_SLOT, slot );
         @SuppressWarnings( "deprecation" )
         HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( TEMPLATE_INFOS_RECAP, Locale.getDefault( ), modelRecap )
                 .getHtml( ), Locale.getDefault( ), modelRecap );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_RECAP, t.getHtml( ) ) );
 
         // ENTRIES
-        List<Response> listResponses = AppointmentHome.findListResponse( _appointment.getIdAppointment( ) );
+        List<Response> listResponses = AppointmentResponseService.findListResponse( _appointment.getIdAppointment( ) );
         for ( Response response : listResponses )
         {
             Entry entry = EntryHome.findByPrimaryKey( response.getEntry( ).getIdEntry( ) );

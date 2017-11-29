@@ -41,7 +41,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
-import fr.paris.lutece.plugins.appointment.business.AppointmentFormHome;
+import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
@@ -83,7 +83,7 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
     {
         Collection<ProviderDescription> collectionProviderDescriptions = new ArrayList<>( );
 
-        List<AppointmentForm> listAppointmentForm = AppointmentFormHome.getActiveAppointmentFormsList( );
+        List<AppointmentForm> listAppointmentForm = FormService.buildAllActiveAppointmentForm( );
         for ( AppointmentForm appointmentForm : listAppointmentForm )
         {
             Action action = _actionService.findByPrimaryKey( task.getAction( ).getId( ) );
@@ -106,7 +106,7 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
     {
         Collection<ProviderDescription> collectionProviderDescriptions = new ArrayList<>( );
 
-        List<AppointmentForm> listAppointmentForm = AppointmentFormHome.getActiveAppointmentFormsList( );
+        List<AppointmentForm> listAppointmentForm = FormService.buildAllActiveAppointmentForm( );
         for ( AppointmentForm appointmentForm : listAppointmentForm )
         {
             collectionProviderDescriptions.add( getProviderDescription( String.valueOf( appointmentForm.getIdForm( ) ) ) );
@@ -121,7 +121,7 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
     @Override
     public ProviderDescription getProviderDescription( String strProviderId )
     {
-        AppointmentForm appointmentForm = AppointmentFormHome.findByPrimaryKey( Integer.parseInt( strProviderId ) );
+        AppointmentForm appointmentForm = FormService.buildAppointmentFormLight( Integer.parseInt( strProviderId ) );
         if ( !appointmentForm.getIsActive( ) )
         {
             return null;
