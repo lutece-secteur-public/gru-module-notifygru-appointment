@@ -33,7 +33,7 @@
  */
 package fr.paris.lutece.plugins.notifygru.modules.appointment.provider;
 
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -227,10 +227,10 @@ public class AppointmentProvider implements IProvider
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_FIRSTNAME, _appointment.getFirstName( ) ) );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_LASTNAME, _appointment.getLastName( ) ) );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_EMAIL, _appointment.getEmail( ) ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );
-        SimpleDateFormat formater = new SimpleDateFormat( PROPERTIE_DATE_FORMAT );
+        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern( PROPERTIE_DATE_FORMAT );
         Slot slot = SlotService.findSlotById( _appointment.getIdSlot( ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formater.format( slot.getDate( ) ) ) );
+        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formatter.format( slot.getDate( ) ) ) );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, slot.getStartingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
