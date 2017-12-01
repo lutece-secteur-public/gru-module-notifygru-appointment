@@ -44,6 +44,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.Strings;
 
+import fr.paris.lutece.plugins.appointment.business.AppointmentDTO;
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
 import fr.paris.lutece.plugins.appointment.business.slot.Slot;
@@ -94,7 +95,7 @@ public class AppointmentProvider implements IProvider
 
     // NEEDED OBJECTS
     /** The _appointment. */
-    private Appointment _appointment;
+    private AppointmentDTO _appointment;
     /** The _appointment form. */
     private AppointmentForm _appointmentForm;
     /** The _appointment gru. */
@@ -113,7 +114,7 @@ public class AppointmentProvider implements IProvider
     public AppointmentProvider( String beanProviderName, String strAppointmentFormId, ResourceHistory resourceHistory )
     {
         super( );
-        _appointment = AppointmentService.findAppointmentById( resourceHistory.getIdResource( ) );
+        _appointment = AppointmentService.buildAppointmentDTOFromIdAppointment( resourceHistory.getIdResource( ) );
         if ( _appointment == null )
         {
             throw new AppException( "No appointment for resource history Id : " + resourceHistory.getIdResource( ) );
