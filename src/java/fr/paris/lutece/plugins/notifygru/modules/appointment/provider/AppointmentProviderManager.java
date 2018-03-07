@@ -158,7 +158,10 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
         List<Entry> listEntry = EntryHome.getEntryList( entryFilter );
         for ( Entry entry : listEntry )
         {
-            referenceList.addItem( entry.getPosition( ), entry.getTitle( ) );
+        	if ( entry.getTitle() != null ) 
+        	{
+        		referenceList.addItem( entry.getPosition( ), entry.getTitle( ) );
+        	}
         }
         return referenceList;
     }
