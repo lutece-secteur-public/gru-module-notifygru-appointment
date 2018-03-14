@@ -46,7 +46,6 @@ import org.bouncycastle.util.Strings;
 
 import fr.paris.lutece.plugins.appointment.business.AppointmentDTO;
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
-import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
 import fr.paris.lutece.plugins.appointment.business.slot.Slot;
 import fr.paris.lutece.plugins.appointment.service.AppointmentResponseService;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
@@ -285,8 +284,11 @@ public class AppointmentProvider implements IProvider
         List<Entry> listEntry = EntryHome.getEntryList( entryFilter );
         for ( Entry entry : listEntry )
         {
-            collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ), null,
-                    entry.getTitle( ) ) );
+            if ( !StringUtils.isEmpty( entry.getTitle( ) ) )
+            {
+                collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ), null,
+                        entry.getTitle( ) ) );
+            }
         }
 
         return collectionNotifyGruMarkers;
