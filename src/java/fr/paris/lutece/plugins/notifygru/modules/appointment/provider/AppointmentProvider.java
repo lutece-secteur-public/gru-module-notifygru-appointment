@@ -44,7 +44,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.Strings;
 
-import fr.paris.lutece.plugins.appointment.business.AppointmentDTO;
 import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 import fr.paris.lutece.plugins.appointment.business.slot.Slot;
 import fr.paris.lutece.plugins.appointment.service.AppointmentResponseService;
@@ -52,6 +51,7 @@ import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.appointment.service.SlotService;
 import fr.paris.lutece.plugins.appointment.web.AppointmentApp;
+import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
 import fr.paris.lutece.plugins.appointmentgru.business.AppointmentGru;
 import fr.paris.lutece.plugins.appointmentgru.services.AppointmentGruService;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
