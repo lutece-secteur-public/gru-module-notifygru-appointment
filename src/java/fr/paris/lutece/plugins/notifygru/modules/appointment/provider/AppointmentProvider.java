@@ -44,7 +44,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.Strings;
 
-import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 import fr.paris.lutece.plugins.appointment.business.slot.Slot;
 import fr.paris.lutece.plugins.appointment.service.AppointmentResponseService;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
@@ -52,6 +51,7 @@ import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.appointment.service.SlotService;
 import fr.paris.lutece.plugins.appointment.web.AppointmentApp;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
+import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFormDTO;
 import fr.paris.lutece.plugins.appointmentgru.business.AppointmentGru;
 import fr.paris.lutece.plugins.appointmentgru.services.AppointmentGruService;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
@@ -96,7 +96,7 @@ public class AppointmentProvider implements IProvider
     /** The _appointment. */
     private AppointmentDTO _appointment;
     /** The _appointment form. */
-    private AppointmentForm _appointmentForm;
+    private AppointmentFormDTO _appointmentForm;
     /** The _appointment gru. */
     private AppointmentGru _appointmentGru;
 
@@ -278,7 +278,7 @@ public class AppointmentProvider implements IProvider
         // ENTRIES
         EntryFilter entryFilter = new EntryFilter( );
         entryFilter.setIdResource( nAppointmentFormId );
-        entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
+        entryFilter.setResourceType( AppointmentFormDTO.RESOURCE_TYPE );
         entryFilter.setEntryParentNull( EntryFilter.FILTER_TRUE );
         entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
         List<Entry> listEntry = EntryHome.getEntryList( entryFilter );

@@ -40,8 +40,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import fr.paris.lutece.plugins.appointment.business.AppointmentForm;
 import fr.paris.lutece.plugins.appointment.service.FormService;
+import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFormDTO;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
@@ -83,8 +83,8 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
     {
         Collection<ProviderDescription> collectionProviderDescriptions = new ArrayList<>( );
 
-        List<AppointmentForm> listAppointmentForm = FormService.buildAllActiveAppointmentForm( );
-        for ( AppointmentForm appointmentForm : listAppointmentForm )
+        List<AppointmentFormDTO> listAppointmentForm = FormService.buildAllActiveAppointmentForm( );
+        for ( AppointmentFormDTO appointmentForm : listAppointmentForm )
         {
             Action action = _actionService.findByPrimaryKey( task.getAction( ).getId( ) );
             Workflow wf = action.getWorkflow( );
@@ -106,8 +106,8 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
     {
         Collection<ProviderDescription> collectionProviderDescriptions = new ArrayList<>( );
 
-        List<AppointmentForm> listAppointmentForm = FormService.buildAllActiveAppointmentForm( );
-        for ( AppointmentForm appointmentForm : listAppointmentForm )
+        List<AppointmentFormDTO> listAppointmentForm = FormService.buildAllActiveAppointmentForm( );
+        for ( AppointmentFormDTO appointmentForm : listAppointmentForm )
         {
             collectionProviderDescriptions.add( getProviderDescription( String.valueOf( appointmentForm.getIdForm( ) ) ) );
         }
@@ -121,7 +121,7 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
     @Override
     public ProviderDescription getProviderDescription( String strProviderId )
     {
-        AppointmentForm appointmentForm = FormService.buildAppointmentFormLight( Integer.parseInt( strProviderId ) );
+        AppointmentFormDTO appointmentForm = FormService.buildAppointmentFormLight( Integer.parseInt( strProviderId ) );
         if ( !appointmentForm.getIsActive( ) )
         {
             return null;
@@ -152,7 +152,7 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
 
         EntryFilter entryFilter = new EntryFilter( );
         entryFilter.setIdResource( Integer.parseInt( strProviderId ) );
-        entryFilter.setResourceType( AppointmentForm.RESOURCE_TYPE );
+        entryFilter.setResourceType( AppointmentFormDTO.RESOURCE_TYPE );
         entryFilter.setEntryParentNull( EntryFilter.FILTER_TRUE );
         entryFilter.setFieldDependNull( EntryFilter.FILTER_TRUE );
         List<Entry> listEntry = EntryHome.getEntryList( entryFilter );
