@@ -98,7 +98,7 @@ public class AppointmentProvider implements IProvider
     private static final String MESSAGE_MARKER_REFERENCE = "module.notifygru.appointment.task_notify_appointment_config.label_reference";
     private static final String MESSAGE_MARKER_URL_CANCEL = "module.notifygru.appointment.task_notify_appointment_config.label_url_cancel";
     private static final String MESSAGE_MARKER_RECAP = "module.notifygru.appointment.task_notify_appointment_config.label_recap";
-    private static final String MESSAGE_MARKER_CANCEL_MOTIVE = "module.notifygru.appointment.task_notify_appointment_config.label_motif_cancel=Motif d'annulation";
+    private static final String MESSAGE_MARKER_CANCEL_MOTIVE = "module.notifygru.appointment.task_notify_appointment_config.label_motif_cancel";
     // INFOS RECAP
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
     private static final String INFOS_RECAP_MARK_SLOT = "slot";
@@ -280,42 +280,34 @@ public class AppointmentProvider implements IProvider
      * @return
      */
     private String getCommentValue( )
-    {
-    	AppLogService.debug("In the getCommentValue method");
+    {    	
         String strCommentValue = StringUtils.EMPTY;
         // Get the id of the appointment
-        int nIdResource = _appointment.getIdAppointment( );
-        AppLogService.debug("id of the appointment :"+nIdResource);
+        int nIdResource = _appointment.getIdAppointment( );     
         // Get the form
         Form form = FormService.findFormLightByPrimaryKey( _appointment.getIdForm( ) );
         // Get all the resource of this appointment and this workflow
         List<ResourceHistory> listResourceHistory = _resourceHistoryService.getAllHistoryByResource( nIdResource, Appointment.APPOINTMENT_RESOURCE_TYPE,
-                form.getIdWorkflow( ) );
-        AppLogService.debug("listResourceHistory "+listResourceHistory);
+                form.getIdWorkflow( ) );        
         // For each resource
         for ( ResourceHistory resourceHistory : listResourceHistory )
         {
             // Get the id history of the resource
             int nIdHistory = resourceHistory.getId( );
-            AppLogService.debug("nIdHistory "+nIdHistory);
             // Get the id of the action
             int nIdAction = resourceHistory.getAction( ).getId( );
-            AppLogService.debug("nIdAction "+nIdAction);
             // Get all the tasks of this action
             List<ITask> listTasks = _taskService.getListTaskByIdAction( nIdAction, LocaleService.getDefault( ) );
-            AppLogService.debug("listTasks "+listTasks);
             // For each task
             for ( ITask task : listTasks )
             {
                 // Get the id of the task
                 int nIdTask = task.getId( );
-                AppLogService.debug("nIdTask "+nIdTask);
                 // Try to find a comment for this task and this id history
                 CommentValue commentValue = _commentService.findByPrimaryKey( nIdHistory, nIdTask, WorkflowUtils.getPlugin( ) );
                 if ( commentValue != null )
                 {
                     strCommentValue = commentValue.getValue( );
-                    AppLogService.debug("commentValue "+commentValue);
                     break;
                 }
             }
