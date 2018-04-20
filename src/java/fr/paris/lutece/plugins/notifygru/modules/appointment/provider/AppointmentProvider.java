@@ -41,9 +41,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.Strings;
 
+import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
+import fr.paris.lutece.plugins.appointment.business.form.Form;
 import fr.paris.lutece.plugins.appointment.business.slot.Slot;
 import fr.paris.lutece.plugins.appointment.service.AppointmentResponseService;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
@@ -58,13 +62,26 @@ import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
+import fr.paris.lutece.plugins.workflow.modules.comment.business.CommentValue;
+import fr.paris.lutece.plugins.workflow.modules.comment.service.CommentValueService;
+import fr.paris.lutece.plugins.workflow.modules.comment.service.ICommentValueService;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.service.provider.IProvider;
 import fr.paris.lutece.plugins.workflow.modules.notifygru.service.provider.NotifyGruMarker;
+import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.plugins.workflowcore.service.action.ActionService;
+import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
+import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
+import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceHistoryService;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
+import fr.paris.lutece.plugins.workflowcore.service.task.TaskService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
 /**
@@ -84,7 +101,7 @@ public class AppointmentProvider implements IProvider
     private static final String MESSAGE_MARKER_REFERENCE = "module.notifygru.appointment.task_notify_appointment_config.label_reference";
     private static final String MESSAGE_MARKER_URL_CANCEL = "module.notifygru.appointment.task_notify_appointment_config.label_url_cancel";
     private static final String MESSAGE_MARKER_RECAP = "module.notifygru.appointment.task_notify_appointment_config.label_recap";
-
+    private static final String MESSAGE_MARKER_CANCEL_MOTIVE = "module.notifygru.appointment.task_notify_appointment_config.label_motif_cancel=Motif d'annulation";
     // INFOS RECAP
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
     private static final String INFOS_RECAP_MARK_SLOT = "slot";
@@ -99,6 +116,11 @@ public class AppointmentProvider implements IProvider
     private AppointmentFormDTO _appointmentForm;
     /** The _appointment gru. */
     private AppointmentGru _appointmentGru;
+
+    // SERVICES
+    private IResourceHistoryService _resourceHistoryService = SpringContextService.getBean( ResourceHistoryService.BEAN_SERVICE );
+    private ITaskService _taskService = SpringContextService.getBean( TaskService.BEAN_SERVICE );
+    private ICommentValueService _commentService = SpringContextService.getBean( CommentValueService.BEAN_SERVICE );
 
     /**
      * Constructor
@@ -234,6 +256,7 @@ public class AppointmentProvider implements IProvider
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, slot.getStartingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
         collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
+        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, getCommentValue( ) ) );
         Map<String, Object> modelRecap = new HashMap<String, Object>( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
         modelRecap.put( INFOS_RECAP_MARK_SLOT, slot );
@@ -252,6 +275,51 @@ public class AppointmentProvider implements IProvider
         }
 
         return collectionNotifyGruMarkers;
+    }
+
+    /**
+     * Get the comment value (motiv of the cancellation of the appointment)
+     * 
+     * @return
+     */
+    private String getCommentValue( )
+    {
+        String strCommentValue = StringUtils.EMPTY;
+        // Get the id of the appointment
+        int nIdResource = _appointment.getIdAppointment( );
+        // Get the form
+        Form form = FormService.findFormLightByPrimaryKey( _appointment.getIdForm( ) );
+        // Get all the resource of this appointment and this workflow
+        List<ResourceHistory> listResourceHistory = _resourceHistoryService.getAllHistoryByResource( nIdResource, Appointment.APPOINTMENT_RESOURCE_TYPE,
+                form.getIdWorkflow( ) );
+        // For each resource
+        for ( ResourceHistory resourceHistory : listResourceHistory )
+        {
+            // Get the id history of the resource
+            int nIdHistory = resourceHistory.getId( );
+            // Get the id of the action
+            int nIdAction = resourceHistory.getAction( ).getId( );
+            // Get all the tasks of this action
+            List<ITask> listTasks = _taskService.getListTaskByIdAction( nIdAction, LocaleService.getDefault( ) );
+            // For each task
+            for ( ITask task : listTasks )
+            {
+                // Get the id of the task
+                int nIdTask = task.getId( );
+                // Try to find a comment for this task and this id history
+                CommentValue commentValue = _commentService.findByPrimaryKey( nIdHistory, nIdTask, WorkflowUtils.getPlugin( ) );
+                if ( commentValue != null )
+                {
+                    strCommentValue = commentValue.getValue( );
+                    break;
+                }
+            }
+            if ( StringUtils.isNotEmpty( strCommentValue ) )
+            {
+                break;
+            }
+        }
+        return strCommentValue;
     }
 
     /**
@@ -290,6 +358,8 @@ public class AppointmentProvider implements IProvider
                         entry.getTitle( ) ) );
             }
         }
+
+        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, MESSAGE_MARKER_CANCEL_MOTIVE, null ) );
 
         return collectionNotifyGruMarkers;
     }
