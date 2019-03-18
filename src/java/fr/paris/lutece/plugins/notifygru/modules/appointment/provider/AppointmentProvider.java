@@ -63,10 +63,10 @@ import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.comment.business.CommentValue;
 import fr.paris.lutece.plugins.workflow.modules.comment.service.CommentValueService;
 import fr.paris.lutece.plugins.workflow.modules.comment.service.ICommentValueService;
-import fr.paris.lutece.plugins.workflow.modules.notifygru.service.provider.IProvider;
-import fr.paris.lutece.plugins.workflow.modules.notifygru.service.provider.NotifyGruMarker;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.plugins.workflowcore.service.provider.IProvider;
+import fr.paris.lutece.plugins.workflowcore.service.provider.InfoMarker;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
@@ -238,40 +238,40 @@ public class AppointmentProvider implements IProvider
      * {@inheritDoc}
      */
     @Override
-    public Collection<NotifyGruMarker> provideMarkerValues( )
+    public Collection<InfoMarker> provideMarkerValues( )
     {
-        Collection<NotifyGruMarker> collectionNotifyGruMarkers = new ArrayList<>( );
+        Collection<InfoMarker> collectionNotifyMarkers = new ArrayList<>( );
 
         // GENERIC
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_FIRSTNAME, _appointment.getFirstName( ) ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_LASTNAME, _appointment.getLastName( ) ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_EMAIL, _appointment.getEmail( ) ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_FIRSTNAME, _appointment.getFirstName( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_LASTNAME, _appointment.getLastName( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_EMAIL, _appointment.getEmail( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern( PROPERTIE_DATE_FORMAT );
         Slot slot = SlotService.findSlotById( _appointment.getIdSlot( ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formatter.format( slot.getDate( ) ) ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, slot.getStartingTime( ).toString( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formatter.format( slot.getDate( ) ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, slot.getStartingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, getCommentValue( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, getCommentValue( ) ) );
         Map<String, Object> modelRecap = new HashMap<String, Object>( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
         modelRecap.put( INFOS_RECAP_MARK_SLOT, slot );
         @SuppressWarnings( "deprecation" )
         HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( TEMPLATE_INFOS_RECAP, Locale.getDefault( ), modelRecap )
                 .getHtml( ), Locale.getDefault( ), modelRecap );
-        collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_RECAP, t.getHtml( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_RECAP, t.getHtml( ) ) );
 
         // ENTRIES
         List<Response> listResponses = AppointmentResponseService.findListResponse( _appointment.getIdAppointment( ) );
         for ( Response response : listResponses )
         {
             Entry entry = EntryHome.findByPrimaryKey( response.getEntry( ).getIdEntry( ) );
-            collectionNotifyGruMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ),
+            collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ),
                     response.getResponseValue( ) ) );
         }
 
-        return collectionNotifyGruMarkers;
+        return collectionNotifyMarkers;
     }
 
     /**
@@ -324,21 +324,21 @@ public class AppointmentProvider implements IProvider
      * 
      * @param nAppointmentFormId
      *            id of the appointmentForm
-     * @return Collection of NotifyGruMarker
+     * @return Collection of InfoMarker
      */
-    public static Collection<NotifyGruMarker> getProviderMarkerDescriptions( int nAppointmentFormId )
+    public static Collection<InfoMarker> getProviderMarkerDescriptions( int nAppointmentFormId )
     {
-        Collection<NotifyGruMarker> collectionNotifyGruMarkers = new ArrayList<>( );
+        Collection<InfoMarker> collectionNotifyMarkers = new ArrayList<>( );
 
         // GENERIC
-        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_FIRSTNAME, MESSAGE_MARKER_FIRSTNAME, null ) );
-        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_LASTNAME, MESSAGE_MARKER_LASTNAME, null ) );
-        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_EMAIL, MESSAGE_MARKER_EMAIL, null ) );
-        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, MESSAGE_MARKER_DATE_APOINTMENT, null ) );
-        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, MESSAGE_MARKER_TIME_APOINTMENT, null ) );
-        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_REFERENCE, MESSAGE_MARKER_REFERENCE, null ) );
-        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_CANCEL, MESSAGE_MARKER_URL_CANCEL, null ) );
-        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_RECAP, MESSAGE_MARKER_RECAP, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_FIRSTNAME, MESSAGE_MARKER_FIRSTNAME, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_LASTNAME, MESSAGE_MARKER_LASTNAME, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_EMAIL, MESSAGE_MARKER_EMAIL, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, MESSAGE_MARKER_DATE_APOINTMENT, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, MESSAGE_MARKER_TIME_APOINTMENT, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_REFERENCE, MESSAGE_MARKER_REFERENCE, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_CANCEL, MESSAGE_MARKER_URL_CANCEL, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_RECAP, MESSAGE_MARKER_RECAP, null ) );
 
         // ENTRIES
         EntryFilter entryFilter = new EntryFilter( );
@@ -351,50 +351,50 @@ public class AppointmentProvider implements IProvider
         {
             if ( !StringUtils.isEmpty( entry.getTitle( ) ) )
             {
-                collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ), null,
+                collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ), null,
                         entry.getTitle( ) ) );
             }
         }
 
-        collectionNotifyGruMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, MESSAGE_MARKER_CANCEL_MOTIVE, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, MESSAGE_MARKER_CANCEL_MOTIVE, null ) );
 
-        return collectionNotifyGruMarkers;
+        return collectionNotifyMarkers;
     }
 
     /**
-     * Construct a NotifyGruMarker with value for given parameters
+     * Construct a InfoMarker with value for given parameters
      * 
      * @param strMarker
      * @param strValue
-     * @return a NotifyGruMarker
+     * @return a InfoMarker
      */
-    private static NotifyGruMarker createMarkerValues( String strMarker, String strValue )
+    private static InfoMarker createMarkerValues( String strMarker, String strValue )
     {
-        NotifyGruMarker notifyGruMarker = new NotifyGruMarker( strMarker );
-        notifyGruMarker.setValue( strValue );
+        InfoMarker notifyMarker = new InfoMarker( strMarker );
+        notifyMarker.setValue( strValue );
 
-        return notifyGruMarker;
+        return notifyMarker;
     }
 
     /**
-     * Construct a NotifyGruMarker with descrition for given parameters
+     * Construct a InfoMarker with descrition for given parameters
      * 
      * @param strMarker
      * @param strDescription
-     * @return a NotifyGruMarker
+     * @return a InfoMarker
      */
-    private static NotifyGruMarker createMarkerDescriptions( String strMarker, String strDescriptionI18n, String strDescription )
+    private static InfoMarker createMarkerDescriptions( String strMarker, String strDescriptionI18n, String strDescription )
     {
-        NotifyGruMarker notifyGruMarker = new NotifyGruMarker( strMarker );
+        InfoMarker notifyMarker = new InfoMarker( strMarker );
         if ( strDescriptionI18n != null )
         {
-            notifyGruMarker.setDescription( I18nService.getLocalizedString( strDescriptionI18n, I18nService.getDefaultLocale( ) ) );
+            notifyMarker.setDescription( I18nService.getLocalizedString( strDescriptionI18n, I18nService.getDefaultLocale( ) ) );
         }
         else
         {
-            notifyGruMarker.setDescription( strDescription );
+            notifyMarker.setDescription( strDescription );
         }
 
-        return notifyGruMarker;
+        return notifyMarker;
     }
 }
