@@ -101,7 +101,6 @@ public class AppointmentProvider implements IProvider
     private static final String MESSAGE_MARKER_CANCEL_MOTIVE = "module.notifygru.appointment.task_notify_appointment_config.label_motif_cancel";
     // INFOS RECAP
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
-    private static final String INFOS_RECAP_MARK_SLOT = "slot";
     private static final String TEMPLATE_INFOS_RECAP = "admin/plugins/workflow/modules/notifygru/appointment/recap.html";
     // PROPERTIES
     private static final String PROPERTIE_DATE_FORMAT = AppPropertiesService.getProperty( "notifygru.appointment.dateformat", "dd-MM-yyyy" );
@@ -250,13 +249,12 @@ public class AppointmentProvider implements IProvider
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern( PROPERTIE_DATE_FORMAT );
         Slot slot =  _appointment.getSlot().get( 0 );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formatter.format( slot.getDate( ) ) ) );
-        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, slot.getStartingTime( ).toString( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, _appointment.getStartingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, getCommentValue( ) ) );
         Map<String, Object> modelRecap = new HashMap< >( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
-        modelRecap.put( INFOS_RECAP_MARK_SLOT, slot );
         @SuppressWarnings( "deprecation" )
         HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( TEMPLATE_INFOS_RECAP, Locale.getDefault( ), modelRecap )
                 .getHtml( ), Locale.getDefault( ), modelRecap );
