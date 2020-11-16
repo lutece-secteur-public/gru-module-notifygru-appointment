@@ -77,9 +77,12 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.portal.util.mvc.utils.MVCUtils;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.html.HtmlTemplate;
+import fr.paris.lutece.util.url.UrlItem;
 
 /**
  *
@@ -99,11 +102,13 @@ public class AppointmentProvider implements IProvider
     private static final String MESSAGE_MARKER_URL_CANCEL = "module.notifygru.appointment.task_notify_appointment_config.label_url_cancel";
     private static final String MESSAGE_MARKER_RECAP = "module.notifygru.appointment.task_notify_appointment_config.label_recap";
     private static final String MESSAGE_MARKER_CANCEL_MOTIVE = "module.notifygru.appointment.task_notify_appointment_config.label_motif_cancel";
+    private static final String  MESSAGE_URL_APPOINTMENT_DASHBOARD = "module.notifygru.appointment.task_notify_appointment_config.label_url_appointment_dashboard";
     // INFOS RECAP
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
     private static final String TEMPLATE_INFOS_RECAP = "admin/plugins/workflow/modules/notifygru/appointment/recap.html";
     // PROPERTIES
     private static final String PROPERTIE_DATE_FORMAT = AppPropertiesService.getProperty( "notifygru.appointment.dateformat", "dd-MM-yyyy" );
+
 
     // NEEDED OBJECTS
     /** The _appointment. */
@@ -252,6 +257,7 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, _appointment.getStartingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD, getDashboardAppointmentUrl( _appointment ).replaceAll( "&", "&amp;" ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, getCommentValue( ) ) );
         Map<String, Object> modelRecap = new HashMap< >( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
@@ -336,6 +342,8 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, MESSAGE_MARKER_TIME_APOINTMENT, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_REFERENCE, MESSAGE_MARKER_REFERENCE, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_CANCEL, MESSAGE_MARKER_URL_CANCEL, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD, MESSAGE_URL_APPOINTMENT_DASHBOARD, null ) );
+
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_RECAP, MESSAGE_MARKER_RECAP, null ) );
 
         // ENTRIES
@@ -395,4 +403,20 @@ public class AppointmentProvider implements IProvider
 
         return notifyMarker;
     }
+    /**
+     * Get the URL user dashboard 
+     * 
+     * @param appointment
+     *            The appointment
+     * @return The URL user dashboard  appointment
+     */
+    private static String getDashboardAppointmentUrl( Appointment appointment )
+    {
+        UrlItem urlItem = new UrlItem( AppPathService.getProdUrl( StringUtils.EMPTY ) + AppPathService.getPortalUrl( ) );
+        urlItem.addParameter( MVCUtils.PARAMETER_PAGE, "appointment" );
+        urlItem.addParameter( MVCUtils.PARAMETER_VIEW, "getMyAppointments" );
+        return urlItem.getUrl( );
+    }
+
+
 }

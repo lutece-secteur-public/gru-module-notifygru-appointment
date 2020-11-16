@@ -46,6 +46,7 @@ public final class AppointmentNotifyGruConstants
     public static final String MARK_TIME_APOINTMENT = "time_appointment";
     public static final String MARK_REFERENCE = "reference";
     public static final String MARK_URL_CANCEL = "url_cancel";
+    public static final String MARK_URL_APPOINTMENT_DASHBOARD = "url_dashboard";
     public static final String MARK_RECAP = "recap";
     public static final String MARK_ENTRY_BASE = "reponse_";
     public static final String MARK_CANCEL_MOTIVE = "cancel_motif";
