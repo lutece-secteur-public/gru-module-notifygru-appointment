@@ -141,7 +141,7 @@ public class AppointmentProvider implements IProvider
         {
             throw new AppException( "No appointment for resource history Id : " + resourceHistory.getIdResource( ) );
         }
-        _appointmentForm = FormService.buildAppointmentForm( Integer.parseInt( strAppointmentFormId ), 0, 0 );
+        _appointmentForm = FormService.buildAppointmentForm( Integer.parseInt( strAppointmentFormId ), 0 );
         if ( _appointmentForm == null )
         {
             throw new AppException( "No appointmentForm for  Id : " + strAppointmentFormId );
