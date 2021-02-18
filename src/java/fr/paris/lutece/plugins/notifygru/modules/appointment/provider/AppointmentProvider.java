@@ -50,7 +50,6 @@ import fr.paris.lutece.plugins.appointment.business.slot.Slot;
 import fr.paris.lutece.plugins.appointment.service.AppointmentResponseService;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.service.FormService;
-import fr.paris.lutece.plugins.appointment.service.SlotService;
 import fr.paris.lutece.plugins.appointment.web.AppointmentApp;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFormDTO;
@@ -76,7 +75,6 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppException;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.utils.MVCUtils;
@@ -102,14 +100,20 @@ public class AppointmentProvider implements IProvider
     private static final String MESSAGE_MARKER_URL_CANCEL = "module.notifygru.appointment.task_notify_appointment_config.label_url_cancel";
     private static final String MESSAGE_MARKER_RECAP = "module.notifygru.appointment.task_notify_appointment_config.label_recap";
     private static final String MESSAGE_MARKER_CANCEL_MOTIVE = "module.notifygru.appointment.task_notify_appointment_config.label_motif_cancel";
-    private static final String  MESSAGE_URL_APPOINTMENT_DASHBOARD = "module.notifygru.appointment.task_notify_appointment_config.label_url_appointment_dashboard";
+    private static final String MESSAGE_URL_APPOINTMENT_DASHBOARD = "module.notifygru.appointment.task_notify_appointment_config.label_url_appointment_dashboard";
+    private static final String MESSAGE_MARKER_URL_REPORT = "module.notifygru.appointment.task_notify_appointment_config.label_url_report";
+
     // INFOS RECAP
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
     private static final String TEMPLATE_INFOS_RECAP = "admin/plugins/workflow/modules/notifygru/appointment/recap.html";
     // PROPERTIES
     private static final String PROPERTIE_DATE_FORMAT = AppPropertiesService.getProperty( "notifygru.appointment.dateformat", "dd-MM-yyyy" );
 
-
+    /**
+     * The name of the XPage
+     */
+    private static final String XPAGE_NAME = "appointment";
+    
     // NEEDED OBJECTS
     /** The _appointment. */
     private AppointmentDTO _appointment;
@@ -256,7 +260,9 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formatter.format( slot.getDate( ) ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, _appointment.getStartingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
+        String strUrlReport = AppointmentApp.getReportAppointmentUrl( _appointment );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_REPORT, strUrlReport.replaceAll( "&", "&amp;" ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD, getDashboardAppointmentUrl( _appointment ).replaceAll( "&", "&amp;" ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, getCommentValue( ) ) );
         Map<String, Object> modelRecap = new HashMap< >( );
@@ -342,6 +348,7 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, MESSAGE_MARKER_TIME_APOINTMENT, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_REFERENCE, MESSAGE_MARKER_REFERENCE, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_CANCEL, MESSAGE_MARKER_URL_CANCEL, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_REPORT, MESSAGE_MARKER_URL_REPORT, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD, MESSAGE_URL_APPOINTMENT_DASHBOARD, null ) );
 
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_RECAP, MESSAGE_MARKER_RECAP, null ) );
@@ -413,7 +420,7 @@ public class AppointmentProvider implements IProvider
     private static String getDashboardAppointmentUrl( Appointment appointment )
     {
         UrlItem urlItem = new UrlItem( AppPathService.getProdUrl( StringUtils.EMPTY ) + AppPathService.getPortalUrl( ) );
-        urlItem.addParameter( MVCUtils.PARAMETER_PAGE, "appointment" );
+        urlItem.addParameter( MVCUtils.PARAMETER_PAGE, XPAGE_NAME );
         urlItem.addParameter( MVCUtils.PARAMETER_VIEW, "getMyAppointments" );
         return urlItem.getUrl( );
     }
