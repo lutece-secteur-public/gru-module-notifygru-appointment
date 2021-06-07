@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -113,7 +113,7 @@ public class AppointmentProvider implements IProvider
      * The name of the XPage
      */
     private static final String XPAGE_NAME = "appointment";
-    
+
     // NEEDED OBJECTS
     /** The _appointment. */
     private AppointmentDTO _appointment;
@@ -256,20 +256,21 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_EMAIL, _appointment.getEmail( ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern( PROPERTIE_DATE_FORMAT );
-        Slot slot =  _appointment.getSlot().get( 0 );
+        Slot slot = _appointment.getSlot( ).get( 0 );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formatter.format( slot.getDate( ) ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, _appointment.getStartingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
         String strUrlReport = AppointmentApp.getReportAppointmentUrl( _appointment );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_REPORT, strUrlReport.replaceAll( "&", "&amp;" ) ) );
-        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD, getDashboardAppointmentUrl( _appointment ).replaceAll( "&", "&amp;" ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD,
+                getDashboardAppointmentUrl( _appointment ).replaceAll( "&", "&amp;" ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, getCommentValue( ) ) );
-        Map<String, Object> modelRecap = new HashMap< >( );
+        Map<String, Object> modelRecap = new HashMap<>( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
         @SuppressWarnings( "deprecation" )
-        HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( TEMPLATE_INFOS_RECAP, Locale.getDefault( ), modelRecap )
-                .getHtml( ), Locale.getDefault( ), modelRecap );
+        HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl(
+                AppTemplateService.getTemplate( TEMPLATE_INFOS_RECAP, Locale.getDefault( ), modelRecap ).getHtml( ), Locale.getDefault( ), modelRecap );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_RECAP, t.getHtml( ) ) );
 
         // ENTRIES
@@ -277,8 +278,8 @@ public class AppointmentProvider implements IProvider
         for ( Response response : listResponses )
         {
             Entry entry = EntryHome.findByPrimaryKey( response.getEntry( ).getIdEntry( ) );
-            collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ),
-                    response.getResponseValue( ) ) );
+            collectionNotifyMarkers
+                    .add( createMarkerValues( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ), response.getResponseValue( ) ) );
         }
 
         return collectionNotifyMarkers;
@@ -290,15 +291,15 @@ public class AppointmentProvider implements IProvider
      * @return
      */
     private String getCommentValue( )
-    {    	
+    {
         String strCommentValue = StringUtils.EMPTY;
         // Get the id of the appointment
-        int nIdResource = _appointment.getIdAppointment( );     
+        int nIdResource = _appointment.getIdAppointment( );
         // Get the form
         Form form = FormService.findFormLightByPrimaryKey( _appointment.getIdForm( ) );
         // Get all the resource of this appointment and this workflow
         List<ResourceHistory> listResourceHistory = _resourceHistoryService.getAllHistoryByResource( nIdResource, Appointment.APPOINTMENT_RESOURCE_TYPE,
-                form.getIdWorkflow( ) );        
+                form.getIdWorkflow( ) );
         // For each resource
         for ( ResourceHistory resourceHistory : listResourceHistory )
         {
@@ -349,7 +350,8 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_REFERENCE, MESSAGE_MARKER_REFERENCE, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_CANCEL, MESSAGE_MARKER_URL_CANCEL, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_REPORT, MESSAGE_MARKER_URL_REPORT, null ) );
-        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD, MESSAGE_URL_APPOINTMENT_DASHBOARD, null ) );
+        collectionNotifyMarkers
+                .add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD, MESSAGE_URL_APPOINTMENT_DASHBOARD, null ) );
 
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_RECAP, MESSAGE_MARKER_RECAP, null ) );
 
@@ -364,8 +366,8 @@ public class AppointmentProvider implements IProvider
         {
             if ( !StringUtils.isEmpty( entry.getTitle( ) ) )
             {
-                collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ), null,
-                        entry.getTitle( ) ) );
+                collectionNotifyMarkers
+                        .add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ), null, entry.getTitle( ) ) );
             }
         }
 
@@ -410,12 +412,13 @@ public class AppointmentProvider implements IProvider
 
         return notifyMarker;
     }
+
     /**
-     * Get the URL user dashboard 
+     * Get the URL user dashboard
      * 
      * @param appointment
      *            The appointment
-     * @return The URL user dashboard  appointment
+     * @return The URL user dashboard appointment
      */
     private static String getDashboardAppointmentUrl( Appointment appointment )
     {
@@ -424,6 +427,5 @@ public class AppointmentProvider implements IProvider
         urlItem.addParameter( MVCUtils.PARAMETER_VIEW, "getMyAppointments" );
         return urlItem.getUrl( );
     }
-
 
 }

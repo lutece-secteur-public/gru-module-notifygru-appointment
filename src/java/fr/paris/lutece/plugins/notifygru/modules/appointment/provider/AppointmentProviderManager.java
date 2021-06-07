@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -126,8 +126,8 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
         {
             return null;
         }
-        ProviderDescription providerDescription = new ProviderDescription( String.valueOf( appointmentForm.getIdForm( ) ), I18nService.getLocalizedString(
-                MESSAGE_PROVIDER_LABEL, I18nService.getDefaultLocale( ) ) + appointmentForm.getIdForm( ) );
+        ProviderDescription providerDescription = new ProviderDescription( String.valueOf( appointmentForm.getIdForm( ) ),
+                I18nService.getLocalizedString( MESSAGE_PROVIDER_LABEL, I18nService.getDefaultLocale( ) ) + appointmentForm.getIdForm( ) );
         providerDescription.setMarkerDescriptions( AppointmentProvider.getProviderMarkerDescriptions( appointmentForm.getIdForm( ) ) );
 
         return providerDescription;
