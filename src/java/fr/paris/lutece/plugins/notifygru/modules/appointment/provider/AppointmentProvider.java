@@ -151,7 +151,7 @@ public class AppointmentProvider implements IProvider
             throw new AppException( "No appointmentForm for  Id : " + strAppointmentFormId );
         }
         _appointmentGru = AppointmentGruService.getService( ).getAppointmentGru( _appointment, beanProviderName );
-        if ( _appointment == null )
+        if ( _appointmentGru == null )
         {
             throw new AppException( "No appointmentGru for appointment : " + _appointment.getIdAppointment( ) + " and beanProvider : " + beanProviderName );
         }
