@@ -1,2 +1,0 @@
-<#assign i = appointment.slot?size>
-${appointment.lastName}<br/>${appointment.firstName}<br/>${appointment.email} <br/>${appointment.dateOfTheAppointment}<br/>#i18n{appointment.labelFrom} ${appointment.slot[0].startingDateTime} #i18n{appointment.labelTo} ${appointment.slot[i - 1].endingTime}
