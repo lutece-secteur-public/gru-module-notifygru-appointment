@@ -433,25 +433,16 @@ public class AppointmentProvider implements IProvider
      *            The appointment
      * @return The recap message
      */
-    private static String getRecapMessage( Appointment appointment ) {
+    private static String getRecapMessage( Appointment appointment )
+    {
 
         List<Slot> slots = appointment.getSlot( );
 
-        return new StringBuilder(  ).append( appointment.getLastName( ) )
-                                    .append( HTML_BREAK_LINE )
-                                    .append( appointment.getFirstName( ) )
-                                    .append( HTML_BREAK_LINE )
-                                    .append( appointment.getEmail( ) )
-                                    .append( HTML_BREAK_LINE )
-                                    .append( appointment.getDateAppointmentTaken( ) )
-                                    .append( HTML_BREAK_LINE )
-                                    .append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_FROM, I18nService.getDefaultLocale( ) ) )
-                                    .append( HTML_BLANK_SPACE )
-                                    .append( slots.get( 0 ).getStartingDateTime( ).toString( ) )
-                                    .append( HTML_BLANK_SPACE )
-                                    .append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_TO, I18nService.getDefaultLocale( ) ) )
-                                    .append( HTML_BLANK_SPACE )
-                                    .append( slots.get( slots.size( ) - 1 ).getEndingTime( ).toString( ) )
-                                    .toString( );
+        return new StringBuilder( ).append( appointment.getLastName( ) ).append( HTML_BREAK_LINE ).append( appointment.getFirstName( ) )
+                .append( HTML_BREAK_LINE ).append( appointment.getEmail( ) ).append( HTML_BREAK_LINE ).append( appointment.getDateAppointmentTaken( ) )
+                .append( HTML_BREAK_LINE ).append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_FROM, I18nService.getDefaultLocale( ) ) )
+                .append( HTML_BLANK_SPACE ).append( slots.get( 0 ).getStartingDateTime( ).toString( ) ).append( HTML_BLANK_SPACE )
+                .append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_TO, I18nService.getDefaultLocale( ) ) ).append( HTML_BLANK_SPACE )
+                .append( slots.get( slots.size( ) - 1 ).getEndingTime( ).toString( ) ).toString( );
     }
 }
