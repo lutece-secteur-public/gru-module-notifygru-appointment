@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,10 +38,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.Strings;
 
 import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
@@ -73,13 +72,11 @@ import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.plugins.workflowcore.service.task.TaskService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.utils.MVCUtils;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
-import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
 /**
@@ -102,12 +99,16 @@ public class AppointmentProvider implements IProvider
     private static final String MESSAGE_MARKER_CANCEL_MOTIVE = "module.notifygru.appointment.task_notify_appointment_config.label_motif_cancel";
     private static final String MESSAGE_URL_APPOINTMENT_DASHBOARD = "module.notifygru.appointment.task_notify_appointment_config.label_url_appointment_dashboard";
     private static final String MESSAGE_MARKER_URL_REPORT = "module.notifygru.appointment.task_notify_appointment_config.label_url_report";
+    private static final String MESSAGE_MARKER_LABEL_FROM = "module.notifygru.appointment.labelFrom";
+    private static final String MESSAGE_MARKER_LABEL_TO = "module.notifygru.appointment.labelTo";
 
     // INFOS RECAP
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
-    private static final String TEMPLATE_INFOS_RECAP = "admin/plugins/workflow/modules/notifygru/appointment/recap.html";
     // PROPERTIES
     private static final String PROPERTIE_DATE_FORMAT = AppPropertiesService.getProperty( "notifygru.appointment.dateformat", "dd-MM-yyyy" );
+    // HTML
+    private static final String HTML_BLANK_SPACE = " ";
+    private static final String HTML_BREAK_LINE = "<br/>";
 
     /**
      * The name of the XPage
@@ -151,7 +152,7 @@ public class AppointmentProvider implements IProvider
             throw new AppException( "No appointmentForm for  Id : " + strAppointmentFormId );
         }
         _appointmentGru = AppointmentGruService.getService( ).getAppointmentGru( _appointment, beanProviderName );
-        if ( _appointment == null )
+        if ( _appointmentGru == null )
         {
             throw new AppException( "No appointmentGru for appointment : " + _appointment.getIdAppointment( ) + " and beanProvider : " + beanProviderName );
         }
@@ -268,10 +269,7 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, getCommentValue( ) ) );
         Map<String, Object> modelRecap = new HashMap<>( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
-        @SuppressWarnings( "deprecation" )
-        HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl(
-                AppTemplateService.getTemplate( TEMPLATE_INFOS_RECAP, Locale.getDefault( ), modelRecap ).getHtml( ), Locale.getDefault( ), modelRecap );
-        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_RECAP, t.getHtml( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_RECAP, getRecapMessage( _appointment ) ) );
 
         // ENTRIES
         List<Response> listResponses = AppointmentResponseService.findListResponse( _appointment.getIdAppointment( ) );
@@ -428,4 +426,23 @@ public class AppointmentProvider implements IProvider
         return urlItem.getUrl( );
     }
 
+    /**
+     * Get the recap message
+     * 
+     * @param appointment
+     *            The appointment
+     * @return The recap message
+     */
+    private static String getRecapMessage( Appointment appointment )
+    {
+
+        List<Slot> slots = appointment.getSlot( );
+
+        return new StringBuilder( ).append( appointment.getLastName( ) ).append( HTML_BREAK_LINE ).append( appointment.getFirstName( ) )
+                .append( HTML_BREAK_LINE ).append( appointment.getEmail( ) ).append( HTML_BREAK_LINE ).append( appointment.getDateAppointmentTaken( ) )
+                .append( HTML_BREAK_LINE ).append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_FROM, I18nService.getDefaultLocale( ) ) )
+                .append( HTML_BLANK_SPACE ).append( slots.get( 0 ).getStartingDateTime( ).toString( ) ).append( HTML_BLANK_SPACE )
+                .append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_TO, I18nService.getDefaultLocale( ) ) ).append( HTML_BLANK_SPACE )
+                .append( slots.get( slots.size( ) - 1 ).getEndingTime( ).toString( ) ).toString( );
+    }
 }
