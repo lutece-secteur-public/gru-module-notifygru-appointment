@@ -42,8 +42,9 @@ public final class AppointmentNotifyGruConstants
     public static final String MARK_FIRSTNAME = "firstName";
     public static final String MARK_LASTNAME = "lastName";
     public static final String MARK_EMAIL = "email";
-    public static final String MARK_DATE_APOINTMENT = "date_appointment";
-    public static final String MARK_TIME_APOINTMENT = "time_appointment";
+    public static final String MARK_DATE_APPOINTMENT = "date_appointment";
+    public static final String MARK_TIME_APPOINTMENT = "time_appointment";
+    public static final String MARK_END_TIME_APPOINTMENT = "end_time_appointment";
     public static final String MARK_REFERENCE = "reference";
     public static final String MARK_URL_CANCEL = "url_cancel";
     public static final String MARK_URL_REPORT = "url_report";
