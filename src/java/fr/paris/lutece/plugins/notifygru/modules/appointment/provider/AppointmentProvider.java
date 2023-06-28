@@ -102,6 +102,7 @@ public class AppointmentProvider implements IProvider
     private static final String MESSAGE_MARKER_URL_REPORT = "module.notifygru.appointment.task_notify_appointment_config.label_url_report";
     private static final String MESSAGE_MARKER_LABEL_FROM = "module.notifygru.appointment.labelFrom";
     private static final String MESSAGE_MARKER_LABEL_TO = "module.notifygru.appointment.labelTo";
+    private static final String MESSAGE_MARKER_NUMBER_RESERVED_SLOTS = "module.notifygru.appointment.task_notify_appointment_config.label_number_reserved_slots";
 
     // INFOS RECAP
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
@@ -272,6 +273,8 @@ public class AppointmentProvider implements IProvider
         Map<String, Object> modelRecap = new HashMap<>( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_RECAP, getRecapMessage( _appointment ) ) );
+        
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_NUMBER_RESERVED_SLOTS, Integer.toString( _appointment.getNbBookedSeats( ) ) ) );
 
         // ENTRIES
         List<Response> listResponses = AppointmentResponseService.findListResponse( _appointment.getIdAppointment( ) );
@@ -355,7 +358,8 @@ public class AppointmentProvider implements IProvider
                 .add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD, MESSAGE_URL_APPOINTMENT_DASHBOARD, null ) );
 
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_RECAP, MESSAGE_MARKER_RECAP, null ) );
-
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_NUMBER_RESERVED_SLOTS, MESSAGE_MARKER_NUMBER_RESERVED_SLOTS, null ) );
+        
         // ENTRIES
         EntryFilter entryFilter = new EntryFilter( );
         entryFilter.setIdResource( nAppointmentFormId );
