@@ -52,6 +52,7 @@ public final class AppointmentNotifyGruConstants
     public static final String MARK_RECAP = "recap";
     public static final String MARK_ENTRY_BASE = "reponse_";
     public static final String MARK_CANCEL_MOTIVE = "cancel_motif";
+    public static final String MARK_NUMBER_RESERVED_SLOTS = "nb_reserved_slots";
 
     /**
      * private constructor for constants class
