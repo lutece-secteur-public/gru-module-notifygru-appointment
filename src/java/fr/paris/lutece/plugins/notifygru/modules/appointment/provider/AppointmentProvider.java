@@ -91,8 +91,9 @@ public class AppointmentProvider implements IProvider
     private static final String MESSAGE_MARKER_FIRSTNAME = "module.notifygru.appointment.task_notify_appointment_config.label_firstname";
     private static final String MESSAGE_MARKER_LASTNAME = "module.notifygru.appointment.task_notify_appointment_config.label_lastname";
     private static final String MESSAGE_MARKER_EMAIL = "module.notifygru.appointment.task_notify_appointment_config.label_email";
-    private static final String MESSAGE_MARKER_DATE_APOINTMENT = "module.notifygru.appointment.task_notify_appointment_config.label_date_appointment";
-    private static final String MESSAGE_MARKER_TIME_APOINTMENT = "module.notifygru.appointment.task_notify_appointment_config.label_time_appointment";
+    private static final String MESSAGE_MARKER_DATE_APPOINTMENT = "module.notifygru.appointment.task_notify_appointment_config.label_date_appointment";
+    private static final String MESSAGE_MARKER_TIME_APPOINTMENT = "module.notifygru.appointment.task_notify_appointment_config.label_time_appointment";
+    private static final String MESSAGE_MARKER_END_TIME_APPOINTMENT = "module.notifygru.appointment.task_notify_appointment_config.label_end_time_appointment";
     private static final String MESSAGE_MARKER_REFERENCE = "module.notifygru.appointment.task_notify_appointment_config.label_reference";
     private static final String MESSAGE_MARKER_URL_CANCEL = "module.notifygru.appointment.task_notify_appointment_config.label_url_cancel";
     private static final String MESSAGE_MARKER_RECAP = "module.notifygru.appointment.task_notify_appointment_config.label_recap";
@@ -101,6 +102,7 @@ public class AppointmentProvider implements IProvider
     private static final String MESSAGE_MARKER_URL_REPORT = "module.notifygru.appointment.task_notify_appointment_config.label_url_report";
     private static final String MESSAGE_MARKER_LABEL_FROM = "module.notifygru.appointment.labelFrom";
     private static final String MESSAGE_MARKER_LABEL_TO = "module.notifygru.appointment.labelTo";
+    private static final String MESSAGE_MARKER_NUMBER_RESERVED_SLOTS = "module.notifygru.appointment.task_notify_appointment_config.label_number_reserved_slots";
 
     // INFOS RECAP
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
@@ -258,8 +260,9 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern( PROPERTIE_DATE_FORMAT );
         Slot slot = _appointment.getSlot( ).get( 0 );
-        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, formatter.format( slot.getDate( ) ) ) );
-        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, _appointment.getStartingTime( ).toString( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APPOINTMENT, formatter.format( slot.getDate( ) ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APPOINTMENT, _appointment.getStartingTime( ).toString( ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_END_TIME_APPOINTMENT, _appointment.getEndingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
         String strUrlReport = AppointmentApp.getReportAppointmentUrl( _appointment );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
@@ -270,6 +273,8 @@ public class AppointmentProvider implements IProvider
         Map<String, Object> modelRecap = new HashMap<>( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_RECAP, getRecapMessage( _appointment ) ) );
+        
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_NUMBER_RESERVED_SLOTS, Integer.toString( _appointment.getNbBookedSeats( ) ) ) );
 
         // ENTRIES
         List<Response> listResponses = AppointmentResponseService.findListResponse( _appointment.getIdAppointment( ) );
@@ -343,8 +348,9 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_FIRSTNAME, MESSAGE_MARKER_FIRSTNAME, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_LASTNAME, MESSAGE_MARKER_LASTNAME, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_EMAIL, MESSAGE_MARKER_EMAIL, null ) );
-        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_DATE_APOINTMENT, MESSAGE_MARKER_DATE_APOINTMENT, null ) );
-        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_TIME_APOINTMENT, MESSAGE_MARKER_TIME_APOINTMENT, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_DATE_APPOINTMENT, MESSAGE_MARKER_DATE_APPOINTMENT, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_TIME_APPOINTMENT, MESSAGE_MARKER_TIME_APPOINTMENT, null ) );
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_END_TIME_APPOINTMENT, MESSAGE_MARKER_END_TIME_APPOINTMENT, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_REFERENCE, MESSAGE_MARKER_REFERENCE, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_CANCEL, MESSAGE_MARKER_URL_CANCEL, null ) );
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_REPORT, MESSAGE_MARKER_URL_REPORT, null ) );
@@ -352,7 +358,8 @@ public class AppointmentProvider implements IProvider
                 .add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD, MESSAGE_URL_APPOINTMENT_DASHBOARD, null ) );
 
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_RECAP, MESSAGE_MARKER_RECAP, null ) );
-
+        collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_NUMBER_RESERVED_SLOTS, MESSAGE_MARKER_NUMBER_RESERVED_SLOTS, null ) );
+        
         // ENTRIES
         EntryFilter entryFilter = new EntryFilter( );
         entryFilter.setIdResource( nAppointmentFormId );
