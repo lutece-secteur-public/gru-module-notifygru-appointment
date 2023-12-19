@@ -160,7 +160,7 @@ public class AppointmentProviderManager extends AbstractProviderManagerWithMappi
         {
             if ( entry.getTitle( ) != null )
             {
-                referenceList.addItem( entry.getPosition( ), entry.getTitle( ) );
+                referenceList.addItem( entry.getIdEntry( ), entry.getTitle( ) );
             }
         }
         return referenceList;
