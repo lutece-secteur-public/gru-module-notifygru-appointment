@@ -291,7 +291,7 @@ public class AppointmentProvider implements IProvider
                 responseRecapValue = StringUtils.EMPTY;
             }
             collectionNotifyMarkers
-                    .add( createMarkerValues( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + response.getEntry( ).getIdEntry( ), responseRecapValue ) );
+                    .add( createMarkerValues( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + response.getEntry( ).getPosition( ), responseRecapValue ) );
         }
         return collectionNotifyMarkers;
     }
@@ -380,7 +380,7 @@ public class AppointmentProvider implements IProvider
             if ( !StringUtils.isEmpty( entry.getTitle( ) ) )
             {
                 collectionNotifyMarkers
-                        .add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getIdEntry(), null, entry.getTitle( ) ) );
+                        .add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + entry.getPosition( ), null, entry.getTitle( ) ) );
             }
         }
 
