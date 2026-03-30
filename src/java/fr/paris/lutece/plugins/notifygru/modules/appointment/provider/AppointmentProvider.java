@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.notifygru.modules.appointment.provider;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -109,7 +110,8 @@ public class AppointmentProvider implements IProvider
     // INFOS RECAP
     private static final String INFOS_RECAP_MARK_APPOINTMENT = "appointment";
     // PROPERTIES
-    private static final String PROPERTIE_DATE_FORMAT = AppPropertiesService.getProperty( "notifygru.appointment.dateformat", "dd-MM-yyyy" );
+    private static final String PROPERTIE_DATE_FORMAT = "notifygru.appointment.dateformat";
+    private static final String PROPERTIE_TIME_FORMAT = "notifygru.appointment.timeformat";
     // HTML
     private static final String HTML_BLANK_SPACE = " ";
     private static final String HTML_BREAK_LINE = "<br/>";
@@ -126,6 +128,8 @@ public class AppointmentProvider implements IProvider
     private AppointmentFormDTO _appointmentForm;
     /** The _appointment gru. */
     private AppointmentGru _appointmentGru;
+    private DateTimeFormatter _dateFormatter;
+    private DateTimeFormatter _timeFormatter;
 
     // SERVICES
     private IResourceHistoryService _resourceHistoryService = SpringContextService.getBean( ResourceHistoryService.BEAN_SERVICE );
@@ -160,6 +164,8 @@ public class AppointmentProvider implements IProvider
         {
             throw new AppException( "No appointmentGru for appointment : " + _appointment.getIdAppointment( ) + " and beanProvider : " + beanProviderName );
         }
+        _dateFormatter = getDateFormatter();
+        _timeFormatter = getTimeFormatter();
     }
 
     /**
@@ -260,9 +266,8 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_LASTNAME, _appointment.getLastName( ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_EMAIL, _appointment.getEmail( ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_REFERENCE, provideDemandReference( ) ) );
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern( PROPERTIE_DATE_FORMAT );
         Slot slot = _appointment.getSlot( ).get( 0 );
-        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APPOINTMENT, formatter.format( slot.getDate( ) ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_DATE_APPOINTMENT, _dateFormatter.format( slot.getDate( ) ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_TIME_APPOINTMENT, _appointment.getStartingTime( ).toString( ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_END_TIME_APPOINTMENT, _appointment.getEndingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
@@ -416,7 +421,7 @@ public class AppointmentProvider implements IProvider
         InfoMarker notifyMarker = new InfoMarker( strMarker );
         if ( strDescriptionI18n != null )
         {
-            notifyMarker.setDescription( I18nService.getLocalizedString( strDescriptionI18n, I18nService.getDefaultLocale( ) ) );
+            notifyMarker.setDescription( I18nService.getLocalizedString( strDescriptionI18n, LocaleService.getDefault( ) ) );
         }
         else
         {
@@ -448,16 +453,51 @@ public class AppointmentProvider implements IProvider
      *            The appointment
      * @return The recap message
      */
-    private static String getRecapMessage( Appointment appointment )
+    private String getRecapMessage( Appointment appointment )
     {
 
         List<Slot> slots = appointment.getSlot( );
 
         return new StringBuilder( ).append( appointment.getLastName( ) ).append( HTML_BREAK_LINE ).append( appointment.getFirstName( ) )
-                .append( HTML_BREAK_LINE ).append( appointment.getEmail( ) ).append( HTML_BREAK_LINE ).append( appointment.getDateAppointmentTaken( ) )
-                .append( HTML_BREAK_LINE ).append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_FROM, I18nService.getDefaultLocale( ) ) )
-                .append( HTML_BLANK_SPACE ).append( slots.get( 0 ).getStartingDateTime( ).toString( ) ).append( HTML_BLANK_SPACE )
-                .append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_TO, I18nService.getDefaultLocale( ) ) ).append( HTML_BLANK_SPACE )
-                .append( slots.get( slots.size( ) - 1 ).getEndingTime( ).toString( ) ).toString( );
+                .append( HTML_BREAK_LINE ).append( appointment.getEmail( ) )
+                .append( HTML_BREAK_LINE ).append( _dateFormatter.format( appointment.getDateAppointmentTaken( ) ) )
+                .append( HTML_BLANK_SPACE ).append( _timeFormatter.format( appointment.getDateAppointmentTaken( ) ) )
+                .append( HTML_BREAK_LINE ).append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_FROM, LocaleService.getDefault( ) ) )
+                .append( HTML_BLANK_SPACE ).append( _dateFormatter.format( slots.get( 0 ).getStartingDateTime( ) ) ).append( HTML_BLANK_SPACE )
+                .append( HTML_BLANK_SPACE ).append( _timeFormatter.format( slots.get( 0 ).getStartingDateTime( ) ) )
+                .append( HTML_BLANK_SPACE )
+                .append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_TO, LocaleService.getDefault( ) ) )
+                .append( HTML_BLANK_SPACE )
+                .append( _timeFormatter.format( slots.get( slots.size( ) - 1 ).getEndingTime( ) ) ).toString( );
+    }
+
+    /**
+     * Get the Date formatter
+     *
+     * @return The DateTimeFormatter
+     */
+    private DateTimeFormatter getDateFormatter( ) {
+        String strSpecificDateFormat = AppPropertiesService.getProperty( PROPERTIE_DATE_FORMAT );
+        if ( strSpecificDateFormat != null )
+        {
+            return DateTimeFormatter.ofPattern( AppPropertiesService.getProperty( PROPERTIE_DATE_FORMAT ) );
+        } else {
+            return DateTimeFormatter.ofLocalizedDate( FormatStyle.SHORT ).withLocale( LocaleService.getDefault( ) ) ;
+        }
+    }
+
+    /**
+     * Get the Time formatter
+     *
+     * @return The DateTimeFormatter
+     */
+    private DateTimeFormatter getTimeFormatter( ) {
+        String strSpecificTimeFormat = AppPropertiesService.getProperty( PROPERTIE_TIME_FORMAT );
+        if ( strSpecificTimeFormat != null )
+        {
+            return DateTimeFormatter.ofPattern( AppPropertiesService.getProperty( PROPERTIE_TIME_FORMAT ) );
+        } else {
+            return DateTimeFormatter.ofLocalizedTime( FormatStyle.SHORT ).withLocale( LocaleService.getDefault( ) ) ;
+        }
     }
 }
