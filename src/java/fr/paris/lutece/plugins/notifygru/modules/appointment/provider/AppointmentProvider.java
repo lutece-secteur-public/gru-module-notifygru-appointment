@@ -458,7 +458,7 @@ public class AppointmentProvider implements IProvider
 
         List<Slot> slots = appointment.getSlot( );
 
-        return new StringBuilder( ).append( appointment.getLastName( ) ).append( HTML_BREAK_LINE ).append( appointment.getFirstName( ) )
+        StringBuilder recap = new StringBuilder( ).append( appointment.getLastName( ) ).append( HTML_BREAK_LINE ).append( appointment.getFirstName( ) )
                 .append( HTML_BREAK_LINE ).append( appointment.getEmail( ) )
                 .append( HTML_BREAK_LINE ).append( _dateFormatter.format( appointment.getDateAppointmentTaken( ) ) )
                 .append( HTML_BLANK_SPACE ).append( _timeFormatter.format( appointment.getDateAppointmentTaken( ) ) )
@@ -468,7 +468,22 @@ public class AppointmentProvider implements IProvider
                 .append( HTML_BLANK_SPACE )
                 .append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_TO, LocaleService.getDefault( ) ) )
                 .append( HTML_BLANK_SPACE )
-                .append( _timeFormatter.format( slots.get( slots.size( ) - 1 ).getEndingTime( ) ) ).toString( );
+                .append( _timeFormatter.format( slots.get( slots.size( ) - 1 ).getEndingTime( ) ) );
+
+        for ( Response response : AppointmentResponseService.findListResponse( appointment.getIdAppointment( ) ) ) {
+            IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( response.getEntry( ) );
+            String responseRecapValue = entryTypeService.getResponseValueForRecap( response.getEntry( ), null, response, LocaleService.getDefault( ) );
+
+            if ( StringUtils.isNotBlank( responseRecapValue ) )
+            {
+                recap.append( HTML_BREAK_LINE )
+                        .append( response.getEntry( ).getTitle( ) )
+                        .append( HTML_BREAK_LINE )
+                        .append( responseRecapValue );
+            }
+        }
+
+        return recap.toString( );
     }
 
     /**
