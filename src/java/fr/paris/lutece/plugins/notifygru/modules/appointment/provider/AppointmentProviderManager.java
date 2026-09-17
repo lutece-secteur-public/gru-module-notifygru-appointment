@@ -37,15 +37,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFormDTO;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
-import fr.paris.lutece.plugins.modulenotifygrumappingmanager.service.AbstractProviderManagerWithMapping;
+import fr.paris.lutece.plugins.modulenotifygrumappingmanager.service.IProviderManagerWithMapping;
 import fr.paris.lutece.plugins.workflow.service.provider.ProviderManagerUtil;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
@@ -60,19 +62,42 @@ import fr.paris.lutece.util.ReferenceList;
 /**
  *
  */
-public class AppointmentProviderManager extends AbstractProviderManagerWithMapping
+@ApplicationScoped
+@Named( AppointmentProviderManager.BEAN_SERVICE )
+public class AppointmentProviderManager implements IProviderManagerWithMapping
 {
+    public static final String BEAN_SERVICE = "notifygru-appointment.ProviderService";
+
+    private String _strId;
+
     private static final String MESSAGE_PROVIDER_LABEL = "module.notifygru.appointment.module.providerappointment";
 
     @Inject
     private ActionService _actionService;
 
     /**
+     * Default constructor for CDI proxy
+     */
+    public AppointmentProviderManager( )
+    {
+        this( BEAN_SERVICE );
+    }
+
+    /**
      * @param strId
      */
     public AppointmentProviderManager( String strId )
     {
-        super( strId );
+        _strId = strId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getId( )
+    {
+        return _strId;
     }
 
     /**
