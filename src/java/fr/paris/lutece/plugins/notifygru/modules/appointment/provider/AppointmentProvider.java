@@ -42,7 +42,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.Strings;
+
+import jakarta.enterprise.inject.literal.NamedLiteral;
+import jakarta.enterprise.inject.spi.CDI;
 
 import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
 import fr.paris.lutece.plugins.appointment.business.form.Form;
@@ -74,7 +76,6 @@ import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.plugins.workflowcore.service.task.TaskService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -132,9 +133,11 @@ public class AppointmentProvider implements IProvider
     private DateTimeFormatter _timeFormatter;
 
     // SERVICES
-    private IResourceHistoryService _resourceHistoryService = SpringContextService.getBean( ResourceHistoryService.BEAN_SERVICE );
-    private ITaskService _taskService = SpringContextService.getBean( TaskService.BEAN_SERVICE );
-    private ICommentValueService _commentService = SpringContextService.getBean( CommentValueService.BEAN_SERVICE );
+    private IResourceHistoryService _resourceHistoryService = CDI.current( ).select( IResourceHistoryService.class,
+            NamedLiteral.of( ResourceHistoryService.BEAN_SERVICE ) ).get( );
+    private ITaskService _taskService = CDI.current( ).select( ITaskService.class, NamedLiteral.of( TaskService.BEAN_SERVICE ) ).get( );
+    private ICommentValueService _commentService = CDI.current( ).select( ICommentValueService.class,
+            NamedLiteral.of( CommentValueService.BEAN_SERVICE ) ).get( );
 
     /**
      * Constructor
@@ -159,7 +162,8 @@ public class AppointmentProvider implements IProvider
         {
             throw new AppException( "No appointmentForm for  Id : " + strAppointmentFormId );
         }
-        _appointmentGru = AppointmentGruService.getService( ).getAppointmentGru( _appointment, beanProviderName );
+        _appointmentGru = CDI.current( ).select( AppointmentGruService.class, NamedLiteral.of( AppointmentGruService.BEAN_NAME ) ).get( )
+                .getAppointmentGru( _appointment, beanProviderName );
         if ( _appointmentGru == null )
         {
             throw new AppException( "No appointmentGru for appointment : " + _appointment.getIdAppointment( ) + " and beanProvider : " + beanProviderName );
@@ -202,7 +206,7 @@ public class AppointmentProvider implements IProvider
     public String provideDemandReference( )
     {
         String strReference = StringUtils.isEmpty( _appointmentForm.getReference( ) ) ? ""
-                : ( Strings.toUpperCase( _appointmentForm.getReference( ).trim( ) ) + " - " );
+                : ( StringUtils.upperCase( _appointmentForm.getReference( ).trim( ) ) + " - " );
         strReference += _appointment.getReference( );
 
         return strReference;

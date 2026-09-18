@@ -6,3 +6,10 @@
 /nb-configuration.xml
 /bin/
 webapp/WEB-INF/conf/db.properties
+target/
+logs/
+java.io.tmpdir/
+.migration/
+*.log
+e2e/artifacts/
+e2e/
