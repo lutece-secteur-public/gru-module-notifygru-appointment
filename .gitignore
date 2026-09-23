@@ -13,3 +13,6 @@ java.io.tmpdir/
 *.log
 e2e/artifacts/
 e2e/
+.claude/
+CLAUDE.md
+AGENTS.md

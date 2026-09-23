@@ -42,6 +42,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 
+import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
+import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFormDTO;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
@@ -159,11 +161,24 @@ public class AppointmentProviderManager implements IProviderManagerWithMapping
     }
 
     /**
-     * {@inheritDoc}
+     * Creates the provider of an appointment resource.
+     *
+     * @param strProviderId
+     *            the id of the appointment form
+     * @param resourceHistory
+     *            the resource history the task runs on
+     * @param request
+     *            the request
+     * @return the provider, or null when the resource is not an existing appointment
      */
     @Override
     public IProvider createProvider( String strProviderId, ResourceHistory resourceHistory, HttpServletRequest request )
     {
+        if ( resourceHistory == null || !Appointment.APPOINTMENT_RESOURCE_TYPE.equals( resourceHistory.getResourceType( ) )
+                || AppointmentService.findAppointmentById( resourceHistory.getIdResource( ) ) == null )
+        {
+            return null;
+        }
         return new AppointmentProvider( ProviderManagerUtil.buildCompleteProviderId( getId( ), strProviderId ), strProviderId, resourceHistory );
     }
 
