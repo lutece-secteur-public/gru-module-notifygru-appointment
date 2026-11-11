@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import jakarta.enterprise.inject.literal.NamedLiteral;
 import jakarta.enterprise.inject.spi.CDI;
@@ -60,6 +61,8 @@ import fr.paris.lutece.plugins.appointmentgru.services.AppointmentGruService;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryFilter;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
+import fr.paris.lutece.plugins.genericattributes.business.Field;
+import fr.paris.lutece.plugins.genericattributes.business.FieldHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.EntryTypeServiceManager;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
@@ -276,10 +279,10 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_END_TIME_APPOINTMENT, _appointment.getEndingTime( ).toString( ) ) );
         String strUrlCancel = AppointmentApp.getCancelAppointmentUrl( _appointment );
         String strUrlReport = AppointmentApp.getReportAppointmentUrl( _appointment );
-        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel.replaceAll( "&", "&amp;" ) ) );
-        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_REPORT, strUrlReport.replaceAll( "&", "&amp;" ) ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_CANCEL, strUrlCancel ) );
+        collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_REPORT, strUrlReport ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_URL_APPOINTMENT_DASHBOARD,
-                getDashboardAppointmentUrl( _appointment ).replaceAll( "&", "&amp;" ) ) );
+                getDashboardAppointmentUrl( _appointment ) ) );
         collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, getCommentValue( ) ) );
         Map<String, Object> modelRecap = new HashMap<>( );
         modelRecap.put( INFOS_RECAP_MARK_APPOINTMENT, _appointment );
@@ -299,8 +302,8 @@ public class AppointmentProvider implements IProvider
             {
                 responseRecapValue = StringUtils.EMPTY;
             }
-            collectionNotifyMarkers
-                    .add( createMarkerValues( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + response.getEntry( ).getPosition( ), responseRecapValue ) );
+            collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + response.getEntry( ).getPosition( ),
+                    responseToHtml( responseRecapValue, isRichText( response.getEntry( ) ) ) ) );
         }
         return collectionNotifyMarkers;
     }
@@ -451,7 +454,8 @@ public class AppointmentProvider implements IProvider
     }
 
     /**
-     * Get the recap message
+     * Get the recap message, as HTML: the values are escaped and separated by line breaks, a rich text response is kept
+     * as the HTML entered, to be sanitized by the notification that renders it.
      * 
      * @param appointment
      *            The appointment
@@ -462,17 +466,18 @@ public class AppointmentProvider implements IProvider
 
         List<Slot> slots = appointment.getSlot( );
 
-        StringBuilder recap = new StringBuilder( ).append( appointment.getLastName( ) ).append( HTML_BREAK_LINE ).append( appointment.getFirstName( ) )
-                .append( HTML_BREAK_LINE ).append( appointment.getEmail( ) )
-                .append( HTML_BREAK_LINE ).append( _dateFormatter.format( appointment.getDateAppointmentTaken( ) ) )
-                .append( HTML_BLANK_SPACE ).append( _timeFormatter.format( appointment.getDateAppointmentTaken( ) ) )
-                .append( HTML_BREAK_LINE ).append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_FROM, LocaleService.getDefault( ) ) )
-                .append( HTML_BLANK_SPACE ).append( _dateFormatter.format( slots.get( 0 ).getStartingDateTime( ) ) ).append( HTML_BLANK_SPACE )
-                .append( HTML_BLANK_SPACE ).append( _timeFormatter.format( slots.get( 0 ).getStartingDateTime( ) ) )
+        StringBuilder recap = new StringBuilder( ).append( escape( appointment.getLastName( ) ) ).append( HTML_BREAK_LINE )
+                .append( escape( appointment.getFirstName( ) ) )
+                .append( HTML_BREAK_LINE ).append( escape( appointment.getEmail( ) ) )
+                .append( HTML_BREAK_LINE ).append( escape( _dateFormatter.format( appointment.getDateAppointmentTaken( ) ) ) )
+                .append( HTML_BLANK_SPACE ).append( escape( _timeFormatter.format( appointment.getDateAppointmentTaken( ) ) ) )
+                .append( HTML_BREAK_LINE ).append( escape( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_FROM, LocaleService.getDefault( ) ) ) )
+                .append( HTML_BLANK_SPACE ).append( escape( _dateFormatter.format( slots.get( 0 ).getStartingDateTime( ) ) ) ).append( HTML_BLANK_SPACE )
+                .append( HTML_BLANK_SPACE ).append( escape( _timeFormatter.format( slots.get( 0 ).getStartingDateTime( ) ) ) )
                 .append( HTML_BLANK_SPACE )
-                .append( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_TO, LocaleService.getDefault( ) ) )
+                .append( escape( I18nService.getLocalizedString( MESSAGE_MARKER_LABEL_TO, LocaleService.getDefault( ) ) ) )
                 .append( HTML_BLANK_SPACE )
-                .append( _timeFormatter.format( slots.get( slots.size( ) - 1 ).getEndingTime( ) ) );
+                .append( escape( _timeFormatter.format( slots.get( slots.size( ) - 1 ).getEndingTime( ) ) ) );
 
         for ( Response response : AppointmentResponseService.findListResponse( appointment.getIdAppointment( ) ) ) {
             IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( response.getEntry( ) );
@@ -481,13 +486,59 @@ public class AppointmentProvider implements IProvider
             if ( StringUtils.isNotBlank( responseRecapValue ) )
             {
                 recap.append( HTML_BREAK_LINE )
-                        .append( response.getEntry( ).getTitle( ) )
+                        .append( escape( response.getEntry( ).getTitle( ) ) )
                         .append( HTML_BREAK_LINE )
-                        .append( responseRecapValue );
+                        .append( responseToHtml( responseRecapValue, isRichText( response.getEntry( ) ) ) );
             }
         }
 
         return recap.toString( );
+    }
+
+    /**
+     * Escapes a text written in an HTML marker value.
+     *
+     * @param strText
+     *            the text, may be null
+     * @return the HTML
+     */
+    private static String escape( String strText )
+    {
+        return StringEscapeUtils.escapeHtml4( strText );
+    }
+
+    /**
+     * Gives a response of the user as HTML.
+     *
+     * @param strResponse
+     *            the response value
+     * @param bRichText
+     *            true when the response is rich text (HTML entered with a rich text editor): it is kept as is and
+     *            sanitized by the notification that renders it; otherwise it is escaped
+     * @return the HTML
+     */
+    static String responseToHtml( String strResponse, boolean bRichText )
+    {
+        return bRichText ? strResponse : escape( strResponse );
+    }
+
+    /**
+     * Tells whether the responses to an entry are rich text: a text area with a rich text editor.
+     *
+     * @param entry
+     *            the entry of a response, its fields not loaded
+     * @return true if the entry uses a rich text editor
+     */
+    private static boolean isRichText( Entry entry )
+    {
+        for ( Field field : FieldHome.getFieldListByIdEntry( entry.getIdEntry( ) ) )
+        {
+            if ( IEntryTypeService.FIELD_RICHTEXT.equals( field.getCode( ) ) )
+            {
+                return Boolean.parseBoolean( field.getValue( ) );
+            }
+        }
+        return false;
     }
 
     /**
