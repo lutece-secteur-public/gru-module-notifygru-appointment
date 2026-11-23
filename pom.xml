@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-notifygru-appointment</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>3.0.5-beta-02</version>
+    <version>3.0.5</version>
     <name>Lutece notifygru appointment module</name>
 
     <repositories>
