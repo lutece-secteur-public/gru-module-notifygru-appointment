@@ -35,10 +35,13 @@ package fr.paris.lutece.plugins.notifygru.modules.appointment.provider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import fr.paris.lutece.plugins.appointment.business.slot.Slot;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 
 /**
@@ -74,5 +77,29 @@ public class AppointmentProviderTest
         Entry entry = new Entry( );
         entry.setIdEntry( 3431 );
         assertEquals( "reponse_2", AppointmentProvider.getEntryMarker( entry, Map.of( 3430, 1, 3431, 2 ) ) );
+    }
+
+    /**
+     * The slots of a multi-slot appointment are read in the order of their ids: the recap starts with the earliest slot and
+     * ends with the latest one.
+     */
+    @Test
+    public void testSlotsOfTheRecapAreSortedByStart( )
+    {
+        Slot later = slot( 10, 30 );
+        Slot earlier = slot( 10, 0 );
+
+        List<Slot> sorted = AppointmentProvider.sortedByStart( List.of( later, earlier ) );
+
+        assertEquals( earlier, sorted.get( 0 ) );
+        assertEquals( later, sorted.get( 1 ) );
+    }
+
+    private static Slot slot( int nHour, int nMinute )
+    {
+        Slot slot = new Slot( );
+        slot.setStartingDateTime( LocalDateTime.of( 2026, 11, 27, nHour, nMinute ) );
+        slot.setEndingDateTime( slot.getStartingDateTime( ).plusMinutes( 30 ) );
+        return slot;
     }
 }

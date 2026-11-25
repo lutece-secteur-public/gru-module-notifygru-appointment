@@ -37,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -500,7 +501,7 @@ public class AppointmentProvider implements IProvider
     private String getRecapMessage( Appointment appointment )
     {
 
-        List<Slot> slots = appointment.getSlot( );
+        List<Slot> slots = sortedByStart( appointment.getSlot( ) );
 
         StringBuilder recap = new StringBuilder( ).append( escape( appointment.getLastName( ) ) ).append( HTML_BREAK_LINE )
                 .append( escape( appointment.getFirstName( ) ) )
@@ -529,6 +530,21 @@ public class AppointmentProvider implements IProvider
         }
 
         return recap.toString( );
+    }
+
+    /**
+     * Gives the slots of an appointment in the order of their start: the appointment starts with the first one and ends
+     * with the last one, whatever the order they were read in.
+     *
+     * @param listSlots
+     *            the slots of the appointment
+     * @return the slots, sorted by starting date and time
+     */
+    static List<Slot> sortedByStart( List<Slot> listSlots )
+    {
+        List<Slot> listSorted = new ArrayList<>( listSlots );
+        listSorted.sort( Comparator.comparing( Slot::getStartingDateTime ) );
+        return listSorted;
     }
 
     /**
