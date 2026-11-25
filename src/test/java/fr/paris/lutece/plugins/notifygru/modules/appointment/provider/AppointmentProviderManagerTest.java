@@ -87,4 +87,25 @@ public class AppointmentProviderManagerTest extends LuteceTestCase
         assertFalse( AppointmentProviderManager.isProviderOfForm( "12", 13 ) );
         assertFalse( AppointmentProviderManager.isProviderOfForm( "x", 12 ) );
     }
+
+    /**
+     * The mapping of an appointment form is offered only to the administrators of its workgroup
+     */
+    @Test
+    public void testFormOfAnotherWorkgroupNotAuthorized( )
+    {
+        fr.paris.lutece.portal.business.user.AdminUser user = new fr.paris.lutece.portal.business.user.AdminUser( );
+        user.setUserWorkgroups( java.util.List.of( "e2e_lb07_mine" ) );
+        assertTrue( AppointmentProviderManager.isFormAuthorized( form( "all" ), user ) );
+        assertTrue( AppointmentProviderManager.isFormAuthorized( form( "e2e_lb07_mine" ), user ) );
+        assertFalse( AppointmentProviderManager.isFormAuthorized( form( "e2e_lb07_other" ), user ) );
+        assertFalse( AppointmentProviderManager.isFormAuthorized( null, user ) );
+    }
+
+    private static fr.paris.lutece.plugins.appointment.business.form.Form form( String strWorkgroup )
+    {
+        fr.paris.lutece.plugins.appointment.business.form.Form form = new fr.paris.lutece.plugins.appointment.business.form.Form( );
+        form.setWorkgroup( strWorkgroup );
+        return form;
+    }
 }

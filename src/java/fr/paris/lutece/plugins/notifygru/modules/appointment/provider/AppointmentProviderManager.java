@@ -44,7 +44,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
+import fr.paris.lutece.plugins.appointment.business.form.Form;
+import fr.paris.lutece.plugins.appointment.business.form.FormHome;
 import fr.paris.lutece.plugins.appointment.business.slot.Slot;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.service.SlotService;
@@ -63,6 +66,7 @@ import fr.paris.lutece.plugins.workflowcore.service.provider.IProvider;
 import fr.paris.lutece.plugins.workflowcore.service.provider.ProviderDescription;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
 import fr.paris.lutece.util.ReferenceList;
 
 /**
@@ -229,5 +233,28 @@ public class AppointmentProviderManager implements IProviderManagerWithMapping
             }
         }
         return referenceList;
+    }
+
+    /**
+     * {@inheritDoc}: the mapping of an appointment form is offered to the administrators of its workgroup
+     */
+    @Override
+    public boolean isAuthorized( String strProviderId, User user )
+    {
+        return isFormAuthorized( FormHome.findByPrimaryKey( NumberUtils.toInt( strProviderId, -1 ) ), user );
+    }
+
+    /**
+     * Tells whether an administrator may map an appointment form
+     * 
+     * @param form
+     *            the form, may be null
+     * @param user
+     *            the administrator
+     * @return true when the form exists and belongs to one of his workgroups (or to all)
+     */
+    static boolean isFormAuthorized( Form form, User user )
+    {
+        return form != null && AdminWorkgroupService.isAuthorized( form, user );
     }
 }
