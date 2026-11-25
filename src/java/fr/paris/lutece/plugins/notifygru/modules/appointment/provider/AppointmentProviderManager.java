@@ -38,12 +38,16 @@ import java.util.Collection;
 import java.util.List;
 
 import jakarta.inject.Inject;
+
+import org.apache.commons.lang3.math.NumberUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 
 import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
+import fr.paris.lutece.plugins.appointment.business.slot.Slot;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
+import fr.paris.lutece.plugins.appointment.service.SlotService;
 import fr.paris.lutece.plugins.appointment.service.FormService;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFormDTO;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
@@ -161,6 +165,21 @@ public class AppointmentProviderManager implements IProviderManagerWithMapping
     }
 
     /**
+     * Tells whether a provider, chosen in a task of a workflow shared by several forms, is the provider of the form of an
+     * appointment.
+     *
+     * @param strProviderId
+     *            the id of the provider: the id of its appointment form
+     * @param nIdForm
+     *            the id of the form of the appointment
+     * @return true if the provider is the one of the form
+     */
+    static boolean isProviderOfForm( String strProviderId, int nIdForm )
+    {
+        return NumberUtils.toInt( strProviderId, -1 ) == nIdForm;
+    }
+
+    /**
      * Creates the provider of an appointment resource.
      *
      * @param strProviderId
@@ -169,7 +188,7 @@ public class AppointmentProviderManager implements IProviderManagerWithMapping
      *            the resource history the task runs on
      * @param request
      *            the request
-     * @return the provider, or null when the resource is not an existing appointment
+     * @return the provider, or null when the resource is not an existing appointment of the form of the provider
      */
     @Override
     public IProvider createProvider( String strProviderId, ResourceHistory resourceHistory, HttpServletRequest request )
@@ -177,6 +196,12 @@ public class AppointmentProviderManager implements IProviderManagerWithMapping
         if ( resourceHistory == null || !Appointment.APPOINTMENT_RESOURCE_TYPE.equals( resourceHistory.getResourceType( ) )
                 || AppointmentService.findAppointmentById( resourceHistory.getIdResource( ) ) == null )
         {
+            return null;
+        }
+        List<Slot> listSlots = SlotService.findListSlotByIdAppointment( resourceHistory.getIdResource( ) );
+        if ( listSlots.isEmpty( ) || !isProviderOfForm( strProviderId, listSlots.get( 0 ).getIdForm( ) ) )
+        {
+            // the task is configured for another form of the workflow: it does nothing for this appointment
             return null;
         }
         return new AppointmentProvider( ProviderManagerUtil.buildCompleteProviderId( getId( ), strProviderId ), strProviderId, resourceHistory );

@@ -76,4 +76,15 @@ public class AppointmentProviderManagerTest extends LuteceTestCase
         resourceHistory.setResourceType( Appointment.APPOINTMENT_RESOURCE_TYPE );
         assertNull( new AppointmentProviderManager( ).createProvider( "1", resourceHistory, null ) );
     }
+
+    /**
+     * A task of a workflow shared by forms A and B, configured with the provider of A, does nothing for an appointment of B.
+     */
+    @Test
+    public void testProviderOfAnotherFormIsNotUsed( )
+    {
+        assertTrue( AppointmentProviderManager.isProviderOfForm( "12", 12 ) );
+        assertFalse( AppointmentProviderManager.isProviderOfForm( "12", 13 ) );
+        assertFalse( AppointmentProviderManager.isProviderOfForm( "x", 12 ) );
+    }
 }
