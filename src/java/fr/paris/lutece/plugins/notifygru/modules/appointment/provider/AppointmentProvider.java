@@ -292,6 +292,7 @@ public class AppointmentProvider implements IProvider
 
         // ENTRIES
         List<Response> listResponses = AppointmentResponseService.findListResponse( _appointment.getIdAppointment( ) );
+        Map<Integer, Integer> mapEntryPositions = getEntryPositions( _appointment.getIdForm( ) );
         for ( Response response : listResponses )
         {
             IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( response.getEntry( ) );
@@ -302,7 +303,7 @@ public class AppointmentProvider implements IProvider
             {
                 responseRecapValue = StringUtils.EMPTY;
             }
-            collectionNotifyMarkers.add( createMarkerValues( AppointmentNotifyGruConstants.MARK_ENTRY_BASE + response.getEntry( ).getPosition( ),
+            collectionNotifyMarkers.add( createMarkerValues( getEntryMarker( response.getEntry( ), mapEntryPositions ),
                     responseToHtml( responseRecapValue, isRichText( response.getEntry( ) ) ) ) );
         }
         return collectionNotifyMarkers;
@@ -399,6 +400,41 @@ public class AppointmentProvider implements IProvider
         collectionNotifyMarkers.add( createMarkerDescriptions( AppointmentNotifyGruConstants.MARK_CANCEL_MOTIVE, MESSAGE_MARKER_CANCEL_MOTIVE, null ) );
 
         return collectionNotifyMarkers;
+    }
+
+    /**
+     * Gives the position of every entry of an appointment form, by entry id.
+     *
+     * @param nIdForm
+     *            the id of the appointment form
+     * @return the positions by entry id
+     */
+    private static Map<Integer, Integer> getEntryPositions( int nIdForm )
+    {
+        EntryFilter entryFilter = new EntryFilter( );
+        entryFilter.setIdResource( nIdForm );
+        entryFilter.setResourceType( AppointmentFormDTO.RESOURCE_TYPE );
+        Map<Integer, Integer> mapPositions = new HashMap<>( );
+        for ( Entry entry : EntryHome.getEntryList( entryFilter ) )
+        {
+            mapPositions.put( entry.getIdEntry( ), entry.getPosition( ) );
+        }
+        return mapPositions;
+    }
+
+    /**
+     * Gives the marker of the response to an entry: the marker described for the entry, built on its position in the form. The entry of a response is
+     * loaded without its position, which is read from the entries of the form.
+     *
+     * @param entry
+     *            the entry of a response
+     * @param mapEntryPositions
+     *            the positions of the entries of the form, by entry id
+     * @return the marker name
+     */
+    static String getEntryMarker( Entry entry, Map<Integer, Integer> mapEntryPositions )
+    {
+        return AppointmentNotifyGruConstants.MARK_ENTRY_BASE + mapEntryPositions.getOrDefault( entry.getIdEntry( ), entry.getPosition( ) );
     }
 
     /**

@@ -35,7 +35,11 @@ package fr.paris.lutece.plugins.notifygru.modules.appointment.provider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
+
+import fr.paris.lutece.plugins.genericattributes.business.Entry;
 
 /**
  * Tests the HTML values of the response and recap markers of AppointmentProvider, declared rich for notifygru.
@@ -58,5 +62,17 @@ public class AppointmentProviderTest
     public void testRichTextResponseIsKept( )
     {
         assertEquals( "<p>Hello <strong>world</strong></p>", AppointmentProvider.responseToHtml( "<p>Hello <strong>world</strong></p>", true ) );
+    }
+
+    /**
+     * The entry of a response is loaded without its position (always 0): the marker of the response is the one described for the entry, built on the
+     * position of the entry in the form, not reponse_0 for every response.
+     */
+    @Test
+    public void testResponseMarkerUsesThePositionOfTheEntryInTheForm( )
+    {
+        Entry entry = new Entry( );
+        entry.setIdEntry( 3431 );
+        assertEquals( "reponse_2", AppointmentProvider.getEntryMarker( entry, Map.of( 3430, 1, 3431, 2 ) ) );
     }
 }
